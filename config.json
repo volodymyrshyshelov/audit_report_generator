@@ -2,6 +2,6 @@
     "reportTitle": "Microsoft 365 Security Audit Report",
     "reportSubtitle": "Audit Generated for Global Reader Account",
     "introText": "This document outlines audit findings for Microsoft 365, categorized by the CIS Benchmark v4.0.0.",
-    "outputPath": "D:\\Work\\reports"
+    "outputPath": ".\\reports"
   }
   
