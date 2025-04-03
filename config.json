@@ -1,23 +1,7 @@
 {
-    "OutputPath": "D:\\Work",
-    "Controls": [
-        {
-            "Name": "Control 1",
-            "Profile": "L1",
-            "Description": "Restrict the use of removable media.",
-            "Rationale": "Prevents unauthorized data transfer.",
-            "Impact": "High risk of data leakage.",
-            "AuditCommand": "Get-SmbServerConfiguration",
-            "References": "https://docs.microsoft.com/security"
-        },
-        {
-            "Name": "Control 2",
-            "Profile": "L1",
-            "Description": "Enable Windows Defender Firewall.",
-            "Rationale": "Protects the system from malicious network traffic.",
-            "Impact": "Increased exposure to network-based attacks.",
-            "AuditCommand": "Get-NetFirewallProfile",
-            "References": "https://docs.microsoft.com/network-security"
-        }
-    ]
-}
+    "reportTitle": "Microsoft 365 Security Audit Report",
+    "reportSubtitle": "Audit Generated for Global Reader Account",
+    "introText": "This document outlines audit findings for Microsoft 365, categorized by the CIS Benchmark v4.0.0.",
+    "outputPath": "D:\\Work\\reports"
+  }
+  
