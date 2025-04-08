@@ -1,2 +1,0 @@
-Disconnect-MgGraph
-$1
