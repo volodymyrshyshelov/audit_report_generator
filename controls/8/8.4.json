@@ -1,0 +1,19 @@
+[
+    {
+        "id": "8.4.1",
+        "level": "L1",
+        "title": "Ensure app permission policies are configured",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 1",
+        "description": "App permission policies in Microsoft Teams control which apps users can install and interact with. Proper configuration prevents the use of unapproved or malicious applications.",
+        "rationale": "Unrestricted app permissions can introduce vulnerabilities or data leakage risks. Managing app permissions enhances organizational security.",
+        "impact": "Users may be restricted from installing certain third-party or custom apps.",
+        "output": "Manual control",
+        "remediation": "1. Go to Microsoft Teams admin center.\n2. Navigate to Teams apps > Permission policies.\n3. Edit or create a policy and configure app permissions as needed.\n4. Assign policies to users appropriately.",
+        "audit_ui": "Microsoft Teams admin center > Teams apps > Permission policies\nReview existing policies and verify that unnecessary app permissions are blocked.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/microsoftteams/teams-custom-app-policies-and-settings"
+        ]
+      }
+    ]

@@ -1,0 +1,443 @@
+{
+  "1.1.1": {
+    "Type": "Automated",
+    "Check": {
+      "Regex": "OnPremisesSyncEnabled\\s*:\\s*True",
+      "ExpectedMatch": false
+    }
+  },
+  "1.1.2": {
+    "Type": "Manual"
+  },
+  "1.1.3": {
+    "Type": "Automated",
+    "Check": {
+      "Regex": "(?<=There are\\s)\\d+",
+      "ExpectedRange": [2, 3, 4]
+    }
+  },
+  "1.1.4": {
+    "Type": "Automated",
+    "Check": {
+      "Regex": "SUCCESS: All administrative users have reduced application footprint licenses",
+      "ExpectedMatch": true
+    }
+  },
+
+  
+  "1.2.1": {
+    "Type": "Automated",
+    "Check": {
+      "Regex": "SUCCESS: No public groups found",
+      "ExpectedMatch": true
+    }
+  },
+  "1.2.2": {
+    "Type": "Automated",
+    "Check": {
+      "Regex": "SUCCESS: All shared mailboxes have sign-in blocked",
+      "ExpectedMatch": true
+    }
+  },
+  "1.3.1": {
+    "Type": "Automated",
+    "Check": {
+      "Regex": "SUCCESS: All domains have PasswordValidityPeriodInDays set to 2147483647",
+      "ExpectedMatch": true
+    }
+  },
+  "1.3.2": {
+    "Type": "Manual"
+  },
+  "1.3.3": {
+    "Type": "Automated",
+    "Check": {
+      "Regex": "SUCCESS: External calendar sharing is disabled",
+      "ExpectedMatch": true
+    }
+  },
+  "1.3.4": {
+    "Type": "Manual"
+  },
+  "1.3.5": {
+    "Type": "Manual"
+  },
+  "1.3.6": {
+    "Type": "Automated",
+    "Check": {
+      "Regex": "Customer Lockbox is enabled",
+      "ExpectedMatch": true
+    }
+  },
+  "1.3.7": {
+    "Type": "Manual"
+  },
+  "1.3.8": {
+    "Type": "Manual"
+  },
+  "2.1.1": {
+    "Type": "Automated"
+  },
+  "2.1.2": {
+    "Type": "Automated"
+  },
+  "2.1.3": {
+    "Type": "Automated"
+  },
+  "2.1.4": {
+    "Type": "Automated"
+  },
+  "2.1.5": {
+    "Type": "Automated"
+  },
+  "2.1.6": {
+    "Type": "Automated"
+  },
+  "2.1.7": {
+    "Type": "Automated"
+  },
+  "2.1.8": {
+    "Type": "Manual"
+  },
+  "2.1.9": {
+    "Type": "Automated"
+  },
+  "2.1.10": {
+    "Type": "Manual"
+  },
+  "2.1.11": {
+    "Type": "Automated"
+  },
+  "2.1.12": {
+    "Type": "Automated"
+  },
+  "2.1.13": {
+    "Type": "Automated"
+  },
+  "2.1.14": {
+    "Type": "Automated"
+  },
+  "2.4.1": {
+    "Type": "Manual"
+  },
+  "2.4.2": {
+    "Type": "Manual"
+  },
+  "2.4.3": {
+    "Type": "Manual"
+  },
+  "2.4.4": {
+    "Type": "Automated"
+  },
+  "3.1.1": {
+    "Type": "Automated"
+  },
+  "3.2.1": {
+    "Type": "Manual"
+  },
+  "3.2.2": {
+    "Type": "Manual"
+  },
+  "3.3.1": {
+    "Type": "Manual"
+  },
+  "5.1.1.1": {
+    "Type": "Automated",
+    "Check": {
+      "Regex": "IsEnabled\\s+False",
+      "ExpectedMatch": true
+    }
+  },
+  "5.1.2.1": {
+    "Type": "Manual"
+  },
+  "5.1.2.2": {
+    "Type": "Automated",
+    "Check": {
+      "Regex": "AllowedToCreateApps\\s+:\\s+False",
+      "ExpectedMatch": true
+    }
+  },
+  "5.1.2.3": {
+    "Type": "Automated",
+    "Check": {
+      "Regex": "AllowedToCreateTenants\\s+:\\s+False",
+      "ExpectedMatch": true
+    }
+  },
+  "5.1.2.4": {
+    "Type": "Manual"
+  },
+  "5.1.2.5": {
+    "Type": "Manual"
+  },
+  "5.1.2.6": {
+    "Type": "Manual"
+  },
+  "5.1.3.1": {
+    "Type": "Automated",
+    "Check": {
+      "Regex": "user\\.userType\\s*-eq\\s*\\\"Guest\\\"",
+      "ExpectedMatch": true
+    }
+  },
+  "5.1.5.1": {
+    "Type": "Automated",
+    "Check": {
+      "Regex": "ManagePermissionGrantsForSelf\\.microsoft-user-default-low",
+      "ExpectedMatch": false
+    }
+  },
+  "5.1.5.2": {
+    "Type": "Manual"
+  },
+  "5.1.6.1": {
+    "Type": "Manual"
+  },
+  "5.1.6.2": {
+    "Type": "Automated",
+    "Check": {
+      "Regex": "GuestUserRoleId\\s+:\\s+(2af84b1e-32c8-42b7-82bc-daa82404023b|10dae51f-b6af-4016-8d66-8c2a99b929b3)",
+      "ExpectedMatch": true
+    }
+  }
+,
+"5.1.6.3": {
+  "Type": "Automated",
+  "Check": {
+    "Regex": "AllowInvitesFrom\\s+:\\s+adminsAndGuestInviters",
+    "ExpectedMatch": true
+  }
+},
+  "5.1.8.1": {
+    "Type": "Automated"
+  },
+  "5.2.2.1": {
+    "Type": "Manual"
+  },
+  "5.2.2.2": {
+    "Type": "Manual"
+  },
+  "5.2.2.3": {
+    "Type": "Manual"
+  },
+  "5.2.2.4": {
+    "Type": "Manual"
+  },
+  "5.2.2.5": {
+    "Type": "Manual"
+  },
+  "5.2.2.6": {
+    "Type": "Manual"
+  },
+  "5.2.2.7": {
+    "Type": "Manual"
+  },
+  "5.2.2.8": {
+    "Type": "Manual"
+  },
+  "5.2.2.9": {
+    "Type": "Manual"
+  },
+  "5.2.2.10": {
+    "Type": "Manual"
+  },
+  "5.2.2.11": {
+    "Type": "Manual"
+  },
+  "5.2.3.1": {
+    "Type": "Manual"
+  },
+  "5.2.3.2": {
+    "Type": "Manual"
+  },
+  "5.2.3.3": {
+    "Type": "Manual"
+  },
+  "5.2.3.4": {
+    "Type": "Manual"
+  },
+  "5.2.3.5": {
+    "Type": "Manual"
+  },
+  "5.2.4.1": {
+    "Type": "Manual"
+  },
+  "5.3.1": {
+    "Type": "Manual"
+  },
+  "5.3.2": {
+    "Type": "Manual"
+  },
+  "5.3.3": {
+    "Type": "Manual"
+  },
+  "5.3.4": {
+    "Type": "Manual"
+  },
+  "6.1.1": {
+    "Type": "Automated"
+  },
+  "6.1.2": {
+    "Type": "Automated"
+  },
+  "6.1.3": {
+    "Type": "Automated"
+  },
+  "6.1.4": {
+    "Type": "Automated"
+  },
+  "6.2.1": {
+    "Type": "Automated"
+  },
+  "6.2.2": {
+    "Type": "Automated"
+  },
+  "6.2.3": {
+    "Type": "Automated"
+  },
+  "6.3.1": {
+    "Type": "Automated"
+  },
+  "6.5.1": {
+    "Type": "Automated"
+  },
+  "6.5.2": {
+    "Type": "Automated"
+  },
+  "6.5.3": {
+    "Type": "Automated"
+  },
+  "6.5.4": {
+    "Type": "Automated"
+  },
+  "7.2.1": {
+    "Type": "Automated"
+  },
+  "7.2.2": {
+    "Type": "Automated"
+  },
+  "7.2.3": {
+    "Type": "Automated"
+  },
+  "7.2.4": {
+    "Type": "Automated"
+  },
+  "7.2.5": {
+    "Type": "Automated"
+  },
+  "7.2.6": {
+    "Type": "Automated"
+  },
+  "7.2.7": {
+    "Type": "Automated"
+  },
+  "7.2.8": {
+    "Type": "Manual"
+  },
+  "7.2.9": {
+    "Type": "Automated"
+  },
+  "7.2.10": {
+    "Type": "Automated"
+  },
+  "7.2.11": {
+    "Type": "Automated"
+  },
+  "7.3.1": {
+    "Type": "Automated"
+  },
+  "7.3.2": {
+    "Type": "Automated"
+  },
+  "7.3.3": {
+    "Type": "Manual"
+  },
+  "7.3.4": {
+    "Type": "Automated"
+  },
+  "8.1.1": {
+    "Type": "Automated"
+  },
+  "8.1.2": {
+    "Type": "Automated"
+  },
+  "8.2.1": {
+    "Type": "Automated"
+  },
+  "8.2.2": {
+    "Type": "Automated"
+  },
+  "8.2.3": {
+    "Type": "Automated"
+  },
+  "8.2.4": {
+    "Type": "Automated"
+  },
+  "8.4.1": {
+    "Type": "Manual"
+  },
+  "8.5.1": {
+    "Type": "Automated"
+  },
+  "8.5.2": {
+    "Type": "Automated"
+  },
+  "8.5.3": {
+    "Type": "Automated"
+  },
+  "8.5.4": {
+    "Type": "Automated"
+  },
+  "8.5.5": {
+    "Type": "Automated"
+  },
+  "8.5.6": {
+    "Type": "Automated"
+  },
+  "8.5.7": {
+    "Type": "Automated"
+  },
+  "8.5.8": {
+    "Type": "Automated"
+  },
+  "8.5.9": {
+    "Type": "Automated"
+  },
+  "8.6.1": {
+    "Type": "Automated"
+  },
+  "9.1.1": {
+    "Type": "Manual"
+  },
+  "9.1.2": {
+    "Type": "Manual"
+  },
+  "9.1.3": {
+    "Type": "Manual"
+  },
+  "9.1.4": {
+    "Type": "Manual"
+  },
+  "9.1.5": {
+    "Type": "Manual"
+  },
+  "9.1.6": {
+    "Type": "Manual"
+  },
+  "9.1.7": {
+    "Type": "Manual"
+  },
+  "9.1.8": {
+    "Type": "Manual"
+  },
+  "9.1.9": {
+    "Type": "Manual"
+  },
+  "9.1.10": {
+    "Type": "Manual"
+  },
+  "9.1.11": {
+    "Type": "Manual"
+  }
+}

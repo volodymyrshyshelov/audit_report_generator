@@ -1,0 +1,53 @@
+[
+    {
+      "id": "6.2.1",
+      "level": "L1",
+      "title": "Ensure all forms of mail forwarding are blocked and/or disabled",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "External mail forwarding allows users to automatically forward mail to addresses outside of the organization. Disabling it reduces the risk of data exfiltration.",
+      "rationale": "Forwarding emails externally may result in data loss or unauthorized disclosure. Blocking automatic forwarding strengthens data protection.",
+      "impact": "Legitimate business processes relying on external forwarding may be disrupted. Consider exceptions via transport rules if necessary.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "1. Connect to Exchange Online using Connect-ExchangeOnline.\n2. Run:\nSet-RemoteDomain Default -AutoForwardEnabled $false",
+      "audit_ui": "Exchange admin center > Mail flow > Remote domains > Default domain > Automatic forwarding\nConfirm setting is disabled.",
+      "audit_powershell": "Connect-ExchangeOnline\nGet-RemoteDomain | Format-Table Identity, AutoForwardEnabled\nEnsure AutoForwardEnabled is False for Default domain.",
+      "references": [
+        "https://learn.microsoft.com/en-us/exchange/security-and-compliance/mail-flow-rules/use-rules-to-block-auto-forwarding"
+      ]
+    },
+    {
+      "id": "6.2.2",
+      "level": "L1",
+      "title": "Ensure mail transport rules do not whitelist specific domains",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "Transport rules that allow messages from specific external domains to bypass spam filters can increase risk. These rules should be reviewed and avoided unless necessary.",
+      "rationale": "Whitelisting domains removes filtering protections and may be exploited by attackers impersonating trusted sources.",
+      "impact": "Messages from whitelisted domains will no longer bypass spam filters. May cause filtering of some legitimate messages.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "1. Connect to Exchange Online.\n2. Review rules using:\nGet-TransportRule | Where-Object { $_.SetSCL -eq '-1' }\n3. Remove or modify rules that whitelist domains unnecessarily.",
+      "audit_ui": "Exchange admin center > Mail flow > Rules\nLook for rules with action 'Set the spam confidence level to -1'.",
+      "audit_powershell": "Connect-ExchangeOnline\nGet-TransportRule | Where-Object { $_.SetSCL -eq '-1' } | Format-Table Name, Description",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/configure-your-spam-filter-policies"
+      ]
+    },
+    {
+      "id": "6.2.3",
+      "level": "L1",
+      "title": "Ensure email from external senders is identified",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "Identifying external senders in email headers or subject lines helps users recognize potentially suspicious messages.",
+      "rationale": "Tagging external emails increases awareness and helps prevent phishing by clearly identifying messages from outside the organization.",
+      "impact": "Some users may find tagging visually disruptive, but it helps enforce good security habits.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "1. Connect to Exchange Online.\n2. Run:\nSet-ExternalInOutlook -Enabled $true",
+      "audit_ui": "Microsoft 365 Defender portal > Policies & rules > Threat policies > Anti-phishing > Default policy\nEnsure external tagging is enabled.",
+      "audit_powershell": "Connect-ExchangeOnline\nGet-ExternalInOutlook | Format-Table Identity, Enabled\nEnsure Enabled is True.",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/external-email-tagging"
+      ]
+    }
+  ]

@@ -1,0 +1,190 @@
+[
+    {
+      "id": "9.1.1",
+      "level": "L1",
+      "title": "Ensure guest user access is restricted",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Controls guest user access in Microsoft Fabric to ensure that only necessary external users can access specific datasets, reports, or workspaces.",
+      "rationale": "Limiting guest access reduces the risk of data exposure and enforces better governance over sensitive content.",
+      "impact": "Restricting guest access may hinder collaboration with external partners unless exceptions are managed.",
+      "output": "Manual control",
+      "remediation": "1. Navigate to Microsoft Fabric admin portal.\n2. Go to Tenant settings > Export and sharing settings.\n3. Review and restrict guest user permissions.\n4. Set toggles such as 'Share content with external users' to Disabled where necessary.",
+      "audit_ui": "Microsoft Fabric admin portal > Tenant settings > Export and sharing settings\nConfirm guest access settings are appropriately restricted.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/power-bi/admin/service-security"
+      ]
+    },
+    {
+      "id": "9.1.2",
+      "level": "L1",
+      "title": "Ensure external user invitations are restricted",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Prevents users from inviting external users to the organization’s Microsoft Fabric tenant unless explicitly allowed.",
+      "rationale": "Restricting invitations ensures tighter control over who gains access to organizational resources.",
+      "impact": "Only designated users or admins will be able to send guest invitations.",
+      "output": "Manual control",
+      "remediation": "1. Navigate to Microsoft Entra admin center > External Identities > External collaboration settings.\n2. Set 'Guest invite settings' to 'Only administrators and users in the guest inviter role can invite'.",
+      "audit_ui": "Microsoft Entra admin center > External Identities > External collaboration settings\nCheck guest invite permissions.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/azure/active-directory/external-identities/external-collaboration-settings"
+      ]
+    },
+    {
+      "id": "9.1.3",
+      "level": "L1",
+      "title": "Ensure guest access to content is restricted",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Restricts what content guest users can access within the Fabric environment, including dashboards, reports, and datasets.",
+      "rationale": "Limits the potential for unintentional sharing of sensitive or proprietary information.",
+      "impact": "May prevent external collaborators from seeing internal resources unless access is explicitly granted.",
+      "output": "Manual control",
+      "remediation": "1. Go to Microsoft Fabric admin portal > Tenant settings.\n2. Review and restrict content access for guest users under appropriate sections.",
+      "audit_ui": "Fabric admin portal > Tenant settings > Content access\nReview permissions for guest users.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/power-bi/admin/service-security"
+      ]
+    },
+    {
+      "id": "9.1.4",
+      "level": "L1",
+      "title": "Ensure 'Publish to web' is restricted",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Controls whether users are allowed to publish reports publicly to the web from Microsoft Fabric.",
+      "rationale": "Restricting 'Publish to web' prevents public exposure of sensitive or proprietary information.",
+      "impact": "Users will be unable to generate publicly accessible links unless explicitly enabled.",
+      "output": "Manual control",
+      "remediation": "1. Go to Fabric admin portal > Tenant settings.\n2. Locate 'Publish to web' and set it to 'Disabled'.",
+      "audit_ui": "Fabric admin portal > Tenant settings > Export and sharing settings\nVerify 'Publish to web' is disabled.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/power-bi/admin/service-security"
+      ]
+    },
+    {
+      "id": "9.1.5",
+      "level": "L2",
+      "title": "Ensure 'Interact with and share R and Python visuals' is 'Disabled'",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 2",
+      "description": "Prevents users from interacting with or sharing R and Python visuals in Microsoft Fabric due to potential security risks posed by embedded code execution.",
+      "rationale": "R and Python visuals can execute code that interacts with external systems. Disabling sharing reduces the risk of misuse.",
+      "impact": "Users will no longer be able to share visuals containing embedded R or Python scripts.",
+      "output": "Manual control",
+      "remediation": "1. Navigate to Fabric admin portal > Tenant settings.\n2. Under 'Export and sharing settings', locate 'Interact with and share R and Python visuals' and set to Disabled.",
+      "audit_ui": "Fabric admin portal > Tenant settings\nEnsure R and Python sharing setting is disabled.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/power-bi/admin/service-security"
+      ]
+    },
+    {
+      "id": "9.1.6",
+      "level": "L1",
+      "title": "Ensure 'Allow users to apply sensitivity labels for content' is 'Enabled'",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Enables users to apply sensitivity labels to content within Microsoft Fabric, improving data classification and protection.",
+      "rationale": "Sensitivity labels provide a way to classify and protect data based on sensitivity. Enabling this feature helps enforce information protection policies.",
+      "impact": "Users will be required to select appropriate labels for content, adding an extra step to the publishing process.",
+      "output": "Manual control",
+      "remediation": "1. Go to Microsoft Fabric admin portal > Tenant settings.\n2. Locate 'Allow users to apply sensitivity labels for content'.\n3. Set the toggle to Enabled.",
+      "audit_ui": "Fabric admin portal > Tenant settings\nEnsure sensitivity label setting is enabled.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/power-bi/admin/sensitivity-labels-overview"
+      ]
+    },
+    {
+      "id": "9.1.7",
+      "level": "L1",
+      "title": "Ensure shareable links are restricted",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Restricts generation of shareable links for content to prevent unauthorized or uncontrolled data access.",
+      "rationale": "Restricting shareable links helps mitigate the risk of content being accessed by unintended recipients.",
+      "impact": "Users may not be able to generate links unless allowed by admin settings.",
+      "output": "Manual control",
+      "remediation": "1. Go to Fabric admin portal > Tenant settings.\n2. Under 'Export and sharing settings', configure link sharing restrictions appropriately.",
+      "audit_ui": "Fabric admin portal > Tenant settings > Export and sharing settings\nConfirm link sharing is restricted.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/power-bi/admin/service-security"
+      ]
+    },
+    {
+      "id": "9.1.8",
+      "level": "L1",
+      "title": "Ensure enabling of external data sharing is restricted",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Prevents users from sharing data externally via APIs or connectors unless explicitly permitted.",
+      "rationale": "Limiting external data sharing helps reduce data exfiltration risks.",
+      "impact": "External partners may be unable to access certain data sets unless explicitly allowed.",
+      "output": "Manual control",
+      "remediation": "1. Navigate to Fabric admin portal > Tenant settings.\n2. Disable 'Allow external data sharing'.",
+      "audit_ui": "Fabric admin portal > Tenant settings\nVerify external sharing toggle is off.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/power-bi/admin/service-security"
+      ]
+    },
+    {
+      "id": "9.1.9",
+      "level": "L1",
+      "title": "Ensure 'Block ResourceKey Authentication' is 'Enabled'",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Prevents access via ResourceKey authentication, enforcing the use of modern authentication methods.",
+      "rationale": "Blocking legacy authentication methods reduces exposure to credential theft.",
+      "impact": "Applications using resource key authentication must be updated to support modern methods.",
+      "output": "Manual control",
+      "remediation": "1. Go to Fabric admin portal > Tenant settings.\n2. Enable 'Block ResourceKey Authentication'.",
+      "audit_ui": "Fabric admin portal > Tenant settings\nEnsure 'Block ResourceKey Authentication' is enabled.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/power-bi/admin/service-security"
+      ]
+    },
+    {
+      "id": "9.1.10",
+      "level": "L1",
+      "title": "Ensure access to APIs by Service Principals is restricted",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Controls whether Service Principals can access Microsoft Fabric APIs.",
+      "rationale": "Restricting API access by Service Principals prevents misuse or abuse of programmatic interfaces.",
+      "impact": "Automated tools or integrations using Service Principals may be limited or require review.",
+      "output": "Manual control",
+      "remediation": "1. Go to Fabric admin portal > Tenant settings.\n2. Under 'Developer settings', restrict API access by Service Principals.",
+      "audit_ui": "Fabric admin portal > Tenant settings > Developer settings\nEnsure appropriate restrictions are configured.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/power-bi/developer/embedded/embed-service-principal"
+      ]
+    },
+    {
+      "id": "9.1.11",
+      "level": "L1",
+      "title": "Ensure Service Principals cannot create and use profiles",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Prevents Service Principals from creating and using profiles to act on behalf of users, enhancing control over automated access.",
+      "rationale": "Disabling profile creation for Service Principals prevents unintended impersonation or privilege escalation.",
+      "impact": "Automated workflows may need redesigning to comply with this setting.",
+      "output": "Manual control",
+      "remediation": "1. Navigate to Fabric admin portal > Tenant settings.\n2. Under 'Developer settings', disable profile creation for Service Principals.",
+      "audit_ui": "Fabric admin portal > Tenant settings\nConfirm Service Principals are restricted from profile creation.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/power-bi/developer/embedded/embed-service-principal"
+      ]
+    }
+  ]
+  

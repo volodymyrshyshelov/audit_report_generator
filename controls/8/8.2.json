@@ -1,0 +1,71 @@
+[
+
+    {
+      "id": "8.2.1",
+      "level": "L2",
+      "title": "Ensure external domains are restricted in the Teams admin center",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 2",
+      "description": "Restricting external domains in Microsoft Teams prevents communication with untrusted or unauthorized external tenants.",
+      "rationale": "Helps prevent data leakage and unwanted collaboration by limiting external communication to approved domains.",
+      "impact": "Users can only communicate with users from specified external domains.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "Teams admin center > Org-wide settings > External access\nSet to 'Only allow specific external domains' and specify approved domains.",
+      "audit_ui": "Teams admin center > Org-wide settings > External access\nVerify that only allowed domains are listed.",
+      "audit_powershell": "Get-CsTenantFederationConfiguration | Format-List AllowedDomains\nEnsure the returned list includes only approved domains.",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoftteams/manage-external-access"
+      ]
+    },
+    {
+      "id": "8.2.2",
+      "level": "L1",
+      "title": "Ensure communication with unmanaged Teams users is disabled",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "Disabling communication with unmanaged Teams users ensures that only users from verified and managed organizations can collaborate.",
+      "rationale": "Unmanaged tenants may not follow the same security practices, increasing risk of data exposure.",
+      "impact": "Users will be restricted from chatting or calling Teams users from unmanaged tenants.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "Set-CsTenantFederationConfiguration -AllowTeamsConsumer $false",
+      "audit_ui": "Teams admin center > Org-wide settings > External access\nConfirm communication with unmanaged Teams users is disabled.",
+      "audit_powershell": "Get-CsTenantFederationConfiguration | Format-List AllowTeamsConsumer\nEnsure value is False.",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoftteams/manage-external-access"
+      ]
+    },
+    {
+      "id": "8.2.3",
+      "level": "L1",
+      "title": "Ensure external Teams users cannot initiate conversations",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "Prevents external Teams users from initiating conversations with internal users unless contacted first.",
+      "rationale": "Reduces the chance of spam or phishing attempts initiated from external organizations.",
+      "impact": "External users will not be able to message internal users unless the internal user initiates contact.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "Teams admin center > Org-wide settings > External access\nEnsure that 'Users can communicate with Skype for Business and Teams users' is disabled or restricted.",
+      "audit_ui": "Teams admin center > Org-wide settings > External access\nReview and disable the ability for external users to initiate contact.",
+      "audit_powershell": "Get-CsTenantFederationConfiguration | Format-List AllowFederatedUsers\nEnsure value is set to False or appropriately restricted.",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoftteams/manage-external-access"
+      ]
+    },
+    {
+      "id": "8.2.4",
+      "level": "L1",
+      "title": "Ensure communication with Skype users is disabled",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "Disables communication with Skype users in Microsoft Teams to reduce external exposure.",
+      "rationale": "Skype consumer accounts are not managed and may pose higher security risks.",
+      "impact": "Users will no longer be able to send or receive messages from Skype consumer accounts.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "Set-CsTenantFederationConfiguration -AllowPublicUsers $false",
+      "audit_ui": "Teams admin center > Org-wide settings > External access\nEnsure communication with Skype users is disabled.",
+      "audit_powershell": "Get-CsTenantFederationConfiguration | Format-List AllowPublicUsers\nEnsure value is False.",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoftteams/manage-external-access"
+      ]
+    }
+  ]

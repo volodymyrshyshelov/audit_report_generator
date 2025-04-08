@@ -1,0 +1,37 @@
+[
+
+{
+  "id": "8.1.1",
+  "level": "L2",
+  "title": "Ensure external file sharing in Teams is enabled for only approved cloud storage services",
+  "type": "Automated",
+  "profile_applicability": "E3 Level 2",
+  "description": "Controls the cloud storage services that can be used in Microsoft Teams for file sharing. Only approved services should be enabled.",
+  "rationale": "Limiting external storage reduces the risk of data exfiltration to untrusted services.",
+  "impact": "Users will only be able to share files using approved cloud services.",
+  "output": "<output from PowerShell script here>",
+  "remediation": "Use Teams admin center:\n1. Go to Microsoft Teams admin center > Teams apps > Setup policies.\n2. Under 'Cloud storage options', uncheck unapproved services.",
+  "audit_ui": "Teams admin center > Teams apps > Setup policies\nVerify only approved storage services are enabled.",
+  "audit_powershell": "Manual control",
+  "references": [
+    "https://learn.microsoft.com/en-us/microsoftteams/manage-cloud-storage-options"
+  ]
+},
+{
+  "id": "8.1.2",
+  "level": "L1",
+  "title": "Ensure users can't send emails to a channel email address",
+  "type": "Automated",
+  "profile_applicability": "E3 Level 1",
+  "description": "Disables the ability for users to send emails directly to a Teams channel, reducing external content injection.",
+  "rationale": "Prevents the potential for phishing or spam via channel email addresses.",
+  "impact": "Users will no longer be able to email content to Teams channels.",
+  "output": "<output from PowerShell script here>",
+  "remediation": "Run in PowerShell:\nSet-TeamFunSettings -AllowUserSendMessageToChannelEmailAddress $false",
+  "audit_ui": "Microsoft Teams admin center > Teams settings\nVerify that 'Email integration' is turned off.",
+  "audit_powershell": "Get-TeamFunSettings | Format-Table AllowUserSendMessageToChannelEmailAddress\nEnsure value is False.",
+  "references": [
+    "https://learn.microsoft.com/en-us/microsoftteams/admin-settings#email-integration"
+  ]
+}
+]

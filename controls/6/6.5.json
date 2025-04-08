@@ -1,0 +1,70 @@
+[
+    {
+        "id": "6.5.1",
+        "level": "L1",
+        "title": "Ensure modern authentication for Exchange Online is enabled",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "Modern authentication allows Microsoft 365 to enforce MFA and other Conditional Access policies, replacing legacy authentication.",
+        "rationale": "Legacy authentication lacks security features and cannot enforce modern policies, posing a risk of credential theft.",
+        "impact": "Clients that don't support modern auth may stop functioning. Ensure supported clients are used.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Run in Exchange Online PowerShell:\nSet-OrganizationConfig -OAuth2ClientProfileEnabled $true",
+        "audit_ui": "Modern auth is managed via PowerShell, not UI.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-OrganizationConfig | Format-List OAuth2ClientProfileEnabled\nEnsure it is True.",
+        "references": [
+          "https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/enable-or-disable-modern-authentication"
+        ]
+      },
+      {
+        "id": "6.5.2",
+        "level": "L1",
+        "title": "Ensure MailTips are enabled for end users",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "MailTips provide real-time guidance to users while composing email messages, helping prevent miscommunication or mistakes.",
+        "rationale": "MailTips help alert users to potential issues such as external recipients or large recipient groups, reducing risk of data leakage.",
+        "impact": "Minor increase in user prompts, but overall improves communication awareness.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Run:\nSet-OrganizationConfig -MailTipsAllTipsEnabled $true",
+        "audit_ui": "Not configurable via UI.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-OrganizationConfig | Format-List MailTipsAllTipsEnabled\nEnsure it is True.",
+        "references": [
+          "https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/mailtips/mailtips-overview"
+        ]
+      },
+      {
+        "id": "6.5.3",
+        "level": "L2",
+        "title": "Ensure additional storage providers are restricted in Outlook on the web",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 2",
+        "description": "Outlook on the web can integrate with external storage services such as Dropbox or Google Drive. Disabling this prevents data exfiltration.",
+        "rationale": "Limiting integration to only approved storage providers reduces the chance of confidential data being shared externally.",
+        "impact": "Users may lose ability to link external file services. Improves control over document sharing.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Run:\nSet-OwaMailboxPolicy -Identity OwaMailboxPolicy-Default -AdditionalStorageProvidersAvailable $false",
+        "audit_ui": "Not managed via UI.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-OwaMailboxPolicy | Format-Table Identity, AdditionalStorageProvidersAvailable\nEnsure it is False.",
+        "references": [
+          "https://learn.microsoft.com/en-us/powershell/module/exchange/set-owamailboxpolicy?view=exchange-ps"
+        ]
+      },
+      {
+        "id": "6.5.4",
+        "level": "L1",
+        "title": "Ensure SMTP AUTH is disabled",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "SMTP AUTH is used by legacy applications to send email. Disabling it reduces exposure to credential theft via brute force and phishing.",
+        "rationale": "SMTP AUTH does not support modern authentication methods and is often targeted in credential attacks.",
+        "impact": "Legacy applications that rely on SMTP AUTH will need to be updated or reconfigured.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "To disable globally, run:\nSet-TransportConfig -SmtpClientAuthenticationDisabled $true",
+        "audit_ui": "Not configurable via UI.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-TransportConfig | Format-List SmtpClientAuthenticationDisabled\nEnsure value is True.",
+        "references": [
+          "https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/authenticated-client-smtp-submission"
+        ]
+      }
+    ]

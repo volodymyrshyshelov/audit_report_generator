@@ -1,0 +1,80 @@
+[
+    {
+      "id": "1.1.1",
+      "level": "L1",
+      "title": "Ensure Administrative accounts are cloud-only",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "Administrative accounts have elevated privileges, including access to data, users, and settings. In hybrid environments, they must be separated from on-premises accounts. These accounts should not be used for day-to-day work and should not be assigned licenses for services like Exchange, Teams, or SharePoint. Ensure administrative accounts are cloud-only by disabling on-premises synchronization.",
+      "rationale": "Separating cloud and on-premises administrative accounts helps reduce the risk of compromise affecting both environments in the event of a breach.",
+      "impact": "Administrators must switch accounts to perform tasks and will not benefit from single sign-on. Migration of permissions from the primary account to a dedicated cloud-only admin account is required, including both Microsoft 365 and Azure RBAC roles. Failing to migrate RBAC roles may result in access issues.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "Identify privileged accounts that are synced from on-premises and create new cloud-only equivalents. Migrate all administrative roles to the new cloud-only account. Reduce the original account’s privileges or remove it based on business need.",
+      "audit_ui": "1. Navigate to Microsoft Entra admin center https://entra.microsoft.com/.\n2. Click to expand Identity > Users select All users.\n3. To the right of the search box click the Add filter button.\n4. Add the On-premises sync enabled filter and click Apply.\n5. For each user account known to be in an administrative role verify it is not present in the filtered list.",
+      "audit_powershell": "Connect-MgGraph -Scopes \"RoleManagement.Read.Directory\",\"User.Read.All\"\n\n# Get directory roles\n$DirectoryRoles = Get-MgDirectoryRole\n$PrivilegedRoles = $DirectoryRoles | Where-Object { $_.DisplayName -like \"*Administrator*\" -or $_.DisplayName -eq \"Global Reader\" }\n\n# Get members of privileged roles\n$RoleMembers = $PrivilegedRoles | ForEach-Object { Get-MgDirectoryRoleMember -DirectoryRoleId $_.Id } | Select-Object Id -Unique\n\n# Check for on-premises sync\n$PrivilegedUsers = $RoleMembers | ForEach-Object { Get-MgUser -UserId $_.Id -Property UserPrincipalName, DisplayName, Id, OnPremisesSyncEnabled }\n\n$PrivilegedUsers | Where-Object { $_.OnPremisesSyncEnabled -eq $true } | Format-Table DisplayName,UserPrincipalName,OnPremisesSyncEnabled",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-365/admin/add-users/add-users?view=o365-worldwide",
+        "https://learn.microsoft.com/en-us/microsoft-365/enterprise/protect-your-global-administrator-accounts?view=o365-worldwide",
+        "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/best-practices#9-use-cloud-native-accounts-for-microsoft-entra-roles",
+        "https://learn.microsoft.com/en-us/entra/fundamentals/whatis",
+        "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference"
+      ]
+    },
+    {
+        "id": "1.1.2",
+        "level": "L1",
+        "title": "Ensure two emergency access accounts have been defined",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 1",
+        "description": "Emergency access or 'break glass' accounts are intended for use during emergencies when normal administrative accounts are inaccessible. These accounts are not tied to individuals and should have both physical and technical controls to prevent unauthorized access. Scenarios include failure of MFA services or loss of access to the last Global Administrator account.",
+        "rationale": "Emergency accounts are critical to ensure continued access to administrative functions during incidents. Without them, an organization may lose visibility into its security posture and face delays in recovery and support.",
+        "impact": "Improper configuration of emergency accounts could weaken security. Microsoft recommends exempting at least one such account from all conditional access policies. Strong authentication such as FIDO2 or certificate-based methods is recommended.",
+        "output": "Manual control",
+        "remediation": "Step 1 - Create two emergency access accounts:\n1. Navigate to Microsoft 365 admin center https://admin.microsoft.com\n2. Expand Users > Active Users\n3. Click Add user and create a new user with the following criteria:\n   - The account name does not identify with a specific person\n   - Use the .onmicrosoft.com domain\n   - Password is randomly generated and at least 16 characters\n   - No license assigned\n   - Assign the Global Administrator role\n4. Repeat for the second account\nStep 2 - Exclude at least one account from conditional access:\n1. Navigate to Microsoft Entra admin center https://entra.microsoft.com\n2. Expand Protection > Conditional Access\n3. Modify rules to exclude one emergency account\nStep 3 - Define procedures:\n- Ensure policies are authorized by senior management\n- Store FIDO2 security keys in a fireproof location\n- Consider breaking passwords into separate pieces for emergency reassembly",
+        "audit_ui": "Step 1 - Ensure a policy and procedure is in place at the organization:\n- Policies and procedures for emergency use must be approved and distributed\n- FIDO2 keys stored securely\n- Passwords at least 16 characters, randomly generated\nStep 2 - Ensure two emergency access accounts are defined:\n1. Navigate to Microsoft 365 admin center https://admin.microsoft.com\n2. Expand Users > Active Users\n3. Verify:\n   - Accounts are correctly named and anonymous\n   - Use the .onmicrosoft.com domain\n   - Are cloud-only\n   - Are unlicensed\n   - Have Global Administrator role\nStep 3 - Ensure at least one account is excluded from Conditional Access:\n1. Navigate to Microsoft Entra admin center https://entra.microsoft.com\n2. Expand Protection > Conditional Access\n3. Inspect policies and ensure one emergency account is excluded",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/security-emergency-access",
+          "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/admin-units-restricted-management",
+          "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-mandatory-multifactor-authentication#accounts",
+          "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/security-emergency-access#monitor-sign-in-and-audit-logs"
+        ]
+        },
+        {
+            "id": "1.1.3",
+            "level": "L1",
+            "title": "Ensure that between two and four global admins are designated",
+            "type": "Automated",
+            "profile_applicability": "E3 Level 1",
+            "description": "Organizations should designate more than one Global Administrator for redundancy and monitoring, but no more than four to reduce attack surface. These accounts should ideally have no licenses assigned to them.",
+            "rationale": "A single Global Administrator can act maliciously without oversight. Too many Global Administrators increase the risk of one being compromised.",
+            "impact": "If fewer than two Global Admins are configured, an additional must be added. If more than four exist, a role review is required to determine which accounts truly need Global Admin privileges.",
+            "output": "<output from PowerShell script here>",
+            "remediation": "To remediate using the UI:\n1. Navigate to the Microsoft 365 admin center https://admin.microsoft.com\n2. Select Users > Active Users.\n3. In the Search field enter the name of the user to be made a Global Administrator.\n4. Select the user's name.\n5. Click Manage roles > Admin center access.\n6. Check Global Administrator and click Save changes.\n7. To remove Global Admins, repeat the process and deselect the appropriate role.",
+            "audit_ui": "1. Navigate to the Microsoft 365 admin center https://admin.microsoft.com\n2. Select Users > Active Users.\n3. Select Filter then select Global Admins.\n4. Review the list of Global Admins to confirm there are from two to four such accounts.",
+            "audit_powershell": "Connect-MgGraph -Scopes Directory.Read.All\n\n# Determine Id of role using the immutable RoleTemplateId value\n$globalAdminRole = Get-MgDirectoryRole -Filter \"RoleTemplateId eq '62e90394-69f5-4237-9190-012177145e10'\"\n$globalAdmins = Get-MgDirectoryRoleMember -DirectoryRoleId $globalAdminRole.Id\n\nWrite-Host \"*** There are\" $globalAdmins.AdditionalProperties.Count \"Global Administrators assigned.\"",
+            "references": [
+              "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.identity.directorymanagement/get-mgdirectoryrole?view=graph-powershell-1.0",
+              "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference#all-roles"
+            ]
+          },
+          {
+            "id": "1.1.4",
+            "level": "L1",
+            "title": "Ensure administrative accounts use licenses with a reduced application footprint",
+            "type": "Automated",
+            "profile_applicability": "E3 Level 1",
+            "description": "Administrative accounts are special privileged accounts with access to sensitive organizational data and settings. Assigning broad licenses may expose these accounts to unnecessary services and applications. Instead, use Microsoft Entra ID P1 or P2 licenses, or no license at all, to reduce the risk of compromise through application attack vectors.",
+            "rationale": "Reducing the application footprint of administrative accounts minimizes exposure to services such as email or Teams that are commonly targeted for phishing and social engineering attacks. Only unprivileged accounts should interact with user-facing applications.",
+            "impact": "Administrators will need to switch accounts to perform day-to-day tasks requiring full licensing. Important alerts must be redirected to other recipients, as administrators may not receive them due to reduced license access.",
+            "output": "<output from PowerShell script here>",
+            "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Click to expand Users > Active users.\n3. Edit user account.\n4. Remove unnecessary licenses or assign only Microsoft Entra ID P1 or P2.\nTo remediate using PowerShell:\n1. Connect-MgGraph -Scopes 'User.ReadWrite.All','Directory.ReadWrite.All'\n2. Use Set-MgUserLicense to assign appropriate licenses to administrative accounts.",
+            "audit_ui": "1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Click to expand Users > Active users.\n3. Sort by the Licenses column.\n4. For each user account in an administrative role, verify the license assigned is either Microsoft Entra ID P1 or P2, or none.",
+            "audit_powershell": "Connect-MgGraph -Scopes \"RoleManagement.Read.Directory\",\"User.Read.All\"\n$DirectoryRoles = Get-MgDirectoryRole\n$PrivilegedRoles = $DirectoryRoles | Where-Object { $_.DisplayName -like '*Administrator*' -or $_.DisplayName -eq 'Global Reader' }\n$RoleMembers = $PrivilegedRoles | ForEach-Object { Get-MgDirectoryRoleMember -DirectoryRoleId $_.Id } | Select-Object Id -Unique\n$PrivilegedUsers = $RoleMembers | ForEach-Object { Get-MgUser -UserId $_.Id -Property UserPrincipalName, DisplayName, Id }\n$Report = [System.Collections.Generic.List[Object]]::new()\nforeach ($Admin in $PrivilegedUsers) {\n  $License = (Get-MgUserLicenseDetail -UserId $Admin.id).SkuPartNumber -join ', '\n  $Object = [pscustomobject][ordered]@{\n    DisplayName = $Admin.DisplayName\n    UserPrincipalName = $Admin.UserPrincipalName\n    License = $License\n  }\n  $Report.Add($Object)\n}\n$Report",
+            "references": [
+              "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.identity.directorymanagement/get-mgdirectoryrole?view=graph-powershell-1.0",
+              "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference#all-roles"
+            ]
+          }
+  ]
+  

@@ -1,0 +1,71 @@
+[
+
+  {
+    "id": "7.3.1",
+    "level": "L2",
+    "title": "Ensure Office 365 SharePoint infected files are disallowed for download",
+    "type": "Automated",
+    "profile_applicability": "E3 Level 2",
+    "description": "When enabled, this setting prevents users from downloading malicious files from SharePoint and OneDrive that have been flagged by Microsoft Defender for Office 365.",
+    "rationale": "Blocking downloads of detected malware protects users and devices from further compromise.",
+    "impact": "Users will be unable to download flagged files. This may result in some disruption, but security is enhanced.",
+    "output": "<output from PowerShell script here>",
+    "remediation": "Set-SPOTenant -DisallowInfectedFileDownload $true",
+    "audit_ui": "SharePoint admin center > Policies > Advanced settings\nVerify that 'Disallow download of infected files' is enabled.",
+    "audit_powershell": "Connect-SPOService\nGet-SPOTenant | Format-List DisallowInfectedFileDownload\nEnsure it is True.",
+    "references": [
+      "https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/turn-on-mdo-for-spo-odfb"
+    ]
+  },
+  {
+    "id": "7.3.2",
+    "level": "L2",
+    "title": "Ensure OneDrive sync is restricted for unmanaged devices",
+    "type": "Automated",
+    "profile_applicability": "E3 Level 2",
+    "description": "Restrict syncing files to unmanaged devices by enabling the setting in the SharePoint admin center or via PowerShell.",
+    "rationale": "Prevents data exfiltration and ensures only managed and compliant devices can sync organizational content.",
+    "impact": "Users on unmanaged devices will not be able to use the sync client for OneDrive.",
+    "output": "<output from PowerShell script here>",
+    "remediation": "Set-SPOTenant -ConditionalAccessPolicy AllowLimitedAccess",
+    "audit_ui": "SharePoint admin center > Policies > Access control\nCheck that sync is restricted to compliant devices.",
+    "audit_powershell": "Connect-SPOService\nGet-SPOTenant | Format-List ConditionalAccessPolicy\nEnsure value is set to AllowLimitedAccess.",
+    "references": [
+      "https://learn.microsoft.com/en-us/sharepoint/control-access-from-unmanaged-devices"
+    ]
+  },
+  {
+    "id": "7.3.3",
+    "level": "L1",
+    "title": "Ensure custom script execution is restricted on personal sites",
+    "type": "Manual",
+    "profile_applicability": "E3 Level 1",
+    "description": "Custom scripts allow site users to run JavaScript and other code on personal sites. Disabling them reduces attack surface.",
+    "rationale": "Restricting custom script execution prevents introduction of insecure or malicious scripts.",
+    "impact": "Some legacy solutions or customizations may stop functioning. Review business needs before disabling.",
+    "output": "Manual control",
+    "remediation": "Set-SPOTenant -DenyAddAndCustomizePages 1 -PersonalSite -Confirm:$false",
+    "audit_ui": "SharePoint admin center > Settings > Custom Script\nEnsure personal sites do not allow custom script.",
+    "audit_powershell": "Connect-SPOService\nGet-SPOUserAndContentPermissionsPolicy | Format-List DenyAddAndCustomizePages\nConfirm custom script is restricted for personal sites.",
+    "references": [
+      "https://learn.microsoft.com/en-us/sharepoint/allow-or-prevent-custom-script"
+    ]
+  },
+  {
+    "id": "7.3.4",
+    "level": "L1",
+    "title": "Ensure custom script execution is restricted on site collections",
+    "type": "Automated",
+    "profile_applicability": "E3 Level 1",
+    "description": "Disabling custom script on site collections prevents unauthorized code execution and enhances security.",
+    "rationale": "Unauthorized scripts may be used for data exfiltration or to exploit vulnerabilities.",
+    "impact": "Custom web parts and scripts will no longer work unless added through approved development channels.",
+    "output": "<output from PowerShell script here>",
+    "remediation": "Set-SPOSite -Identity <SiteURL> -DenyAddAndCustomizePages Enabled",
+    "audit_ui": "SharePoint admin center > Active sites\nSelect site > Settings > Custom script\nEnsure setting is disabled.",
+    "audit_powershell": "Connect-SPOService\nGet-SPOSite | Format-Table URL, DenyAddAndCustomizePages\nEnsure value is Enabled.",
+    "references": [
+      "https://learn.microsoft.com/en-us/sharepoint/allow-or-prevent-custom-script"
+    ]
+  }
+]

@@ -1,0 +1,297 @@
+[
+    {
+      "id": "5.2.2.1",
+      "level": "L1",
+      "title": "Ensure multifactor authentication is enabled for all users in administrative roles",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Multifactor authentication is a process that requires an additional form of identification during the sign-in process, such as a code from a mobile device or a fingerprint scan, to enhance security. Ensure users in administrator roles have MFA capabilities enabled.",
+      "rationale": "Multifactor authentication provides additional assurance that the individual attempting to gain access is who they claim to be. With MFA, an attacker would need to compromise at least two authentication mechanisms, increasing the difficulty of compromise.",
+      "impact": "All users in administrative roles will be required to enroll in multifactor authentication. This may necessitate a change to user routine.",
+      "output": "Manual control",
+      "remediation": "To remediate using the UI:\n1. Navigate to the Microsoft Entra admin center https://entra.microsoft.com.\n2. Expand Protection > Conditional Access and select Policies.\n3. Click New policy.\n4. Under Users, include Select users and groups and check Directory roles.\n5. Include the required administrative roles.\n6. Under Target resources, select All cloud apps without exclusions.\n7. Under Grant, select Grant Access and Require multifactor authentication.\n8. Set policy to Report Only or On as appropriate.\n9. Click Create.",
+      "audit_ui": "1. Navigate to Microsoft Entra admin center https://entra.microsoft.com.\n2. Go to Protection > Conditional Access > Policies.\n3. Ensure a policy exists with Directory roles, All cloud apps, and MFA requirement.\n4. Confirm Enable policy is set to On.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-policy-admin-mfa",
+        "https://security.microsoft.com/"
+      ]
+    },
+    {
+      "id": "5.2.2.2",
+      "level": "L1",
+      "title": "Ensure multifactor authentication is enabled for all users",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Enable multifactor authentication for all users in the Microsoft 365 tenant. Users will be prompted to authenticate with a second factor upon logging in to Microsoft 365 services.",
+      "rationale": "MFA requires at least two authentication factors, significantly reducing the risk of compromise. It helps ensure that access is granted only to verified users.",
+      "impact": "All users must enroll in MFA using SMS, phone, or an authentication app. This may change user routines but increases security.",
+      "output": "Manual control",
+      "remediation": "To remediate using the UI:\n1. Navigate to Microsoft Entra admin center https://entra.microsoft.com.\n2. Expand Protection > Conditional Access and select Policies.\n3. Create a policy targeting All users and All cloud apps.\n4. Set Grant to Require multifactor authentication.\n5. Set policy to On and save.",
+      "audit_ui": "1. Go to Entra admin center > Protection > Conditional Access.\n2. Confirm a policy exists targeting All users with MFA required.\n3. Ensure policy is enabled.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-policy-all-users-mfa",
+        "https://security.microsoft.com/"
+      ]
+    },
+    {
+      "id": "5.2.2.3",
+      "level": "L1",
+      "title": "Enable Conditional Access policies to block legacy authentication",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Legacy authentication refers to protocols that don’t support modern authentication and MFA, such as IMAP, SMTP, POP3. These should be blocked to prevent bypass of Conditional Access and MFA policies.",
+      "rationale": "Blocking legacy authentication helps enforce stronger authentication methods and protects against brute force and password spray attacks.",
+      "impact": "Some older applications may lose access unless updated or reconfigured.",
+      "output": "Manual control",
+      "remediation": "1. Navigate to Microsoft Entra admin center > Protection > Conditional Access.\n2. Create a new policy targeting All users (or specified roles).\n3. Under Cloud apps or actions, select All cloud apps.\n4. Under Conditions > Client apps, include legacy authentication clients.\n5. Under Grant, select Block access.\n6. Enable and save the policy.",
+      "audit_ui": "1. Navigate to Conditional Access policies.\n2. Verify a policy exists that blocks legacy authentication protocols.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/block-legacy-authentication"
+      ]
+    },
+    {
+      "id": "5.2.2.4",
+      "level": "L1",
+      "title": "Ensure Sign-in frequency is enabled and browser sessions are not persistent for Administrative users",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Sign-in frequency controls how often users must authenticate. Disabling persistent browser sessions for admins reduces the chance of unauthorized access if a session is hijacked.",
+      "rationale": "Frequent re-authentication and non-persistent sessions protect against token theft and session hijacking, especially for privileged accounts.",
+      "impact": "Admins will be required to sign in more frequently. This may impact user experience but improves session security.",
+      "output": "Manual control",
+      "remediation": "1. Go to Microsoft Entra admin center > Protection > Conditional Access.\n2. Create or edit a policy targeting administrative roles.\n3. Under Session controls, configure Sign-in frequency and disable Persistent browser session.\n4. Save and enable the policy.",
+      "audit_ui": "1. Navigate to Conditional Access policies.\n2. Check that session controls include frequency settings and browser persistence is disabled.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-session-lifetime"
+      ]
+    },
+    {
+      "id": "5.2.2.5",
+      "level": "L2",
+      "title": "Ensure 'Phishing-resistant MFA strength' is required for Administrators",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 2",
+      "description": "Phishing-resistant MFA includes certificate-based, FIDO2, and Windows Hello for Business authentication methods. These are stronger than traditional OTP or app-based MFA.",
+      "rationale": "Stronger MFA methods reduce susceptibility to phishing and credential theft attacks.",
+      "impact": "Admins must use supported phishing-resistant methods, which may require hardware or additional configuration.",
+      "output": "Manual control",
+      "remediation": "1. Navigate to Microsoft Entra admin center.\n2. Go to Protection > Conditional Access > Authentication Strength.\n3. Create a strength policy selecting 'Phishing-resistant MFA'.\n4. Apply this in a Conditional Access policy targeting administrator roles.",
+      "audit_ui": "1. Check Conditional Access policies.\n2. Verify authentication strength includes phishing-resistant MFA.\n3. Confirm policy targets administrative roles.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-authentication-strengths"
+      ]
+    },
+    {
+        "id": "5.2.2.6",
+        "level": "L1",
+        "title": "Enable Identity Protection user risk policies",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 1",
+        "description": "User risk policies in Identity Protection detect risky user behavior, such as leaked credentials, and can enforce actions like requiring password change or blocking access.",
+        "rationale": "Enabling risk-based policies enhances protection by automatically responding to potential account compromises.",
+        "impact": "Users identified as risky may be prompted for MFA or password change. Some false positives are possible.",
+        "output": "Manual control",
+        "remediation": "1. Go to Microsoft Entra admin center > Protection > Identity Protection.\n2. Under Policies, choose User risk policy.\n3. Set Assignments to All users or specific groups.\n4. Under Controls, configure actions like Require password change.\n5. Enable the policy and Save.",
+        "audit_ui": "1. Navigate to Identity Protection > User risk policy.\n2. Confirm policy is enabled and assigned.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/entra/id-protection/howto-user-risk-policy"
+        ]
+      },
+      {
+        "id": "5.2.2.7",
+        "level": "L1",
+        "title": "Enable Identity Protection sign-in risk policies",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 1",
+        "description": "Sign-in risk policies evaluate the likelihood that a sign-in attempt is not authorized and take actions like enforcing MFA or blocking access.",
+        "rationale": "Automated detection and remediation of suspicious sign-ins helps protect against unauthorized access.",
+        "impact": "Users may be prompted for MFA or blocked based on risk level. Careful tuning can reduce false positives.",
+        "output": "Manual control",
+        "remediation": "1. Go to Microsoft Entra admin center > Protection > Identity Protection.\n2. Under Policies, select Sign-in risk policy.\n3. Assign to All users or specific groups.\n4. Set Controls like Require MFA.\n5. Enable and Save.",
+        "audit_ui": "1. Navigate to Identity Protection > Sign-in risk policy.\n2. Verify policy is enabled with appropriate assignments and controls.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/entra/id-protection/howto-sign-in-risk-policy"
+        ]
+      },
+      {
+        "id": "5.2.2.8",
+        "level": "L2",
+        "title": "Ensure admin center access is limited to administrative roles",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 2",
+        "description": "Restricting access to the Microsoft 365 and Entra admin centers ensures that only assigned administrative roles can access sensitive configurations.",
+        "rationale": "Limiting access reduces the risk of unauthorized configuration changes or exposure to sensitive data.",
+        "impact": "May require updates to role assignments and Conditional Access policies.",
+        "output": "Manual control",
+        "remediation": "1. Use role-based access control (RBAC) to restrict access.\n2. Apply Conditional Access to scope access by role and location.\n3. Monitor and regularly review role assignments.",
+        "audit_ui": "1. Navigate to Entra admin center > Roles and administrators.\n2. Verify only appropriate users have admin roles.\n3. Check Conditional Access policies for admin portal restrictions.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/overview"
+        ]
+      },
+      {
+        "id": "5.2.2.9",
+        "level": "L2",
+        "title": "Ensure 'sign-in risk' is blocked for medium and high risk",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 2",
+        "description": "Blocking sign-ins with medium or high risk levels ensures proactive protection against potentially compromised accounts.",
+        "rationale": "Reducing access from high-risk sessions helps prevent unauthorized access and account misuse.",
+        "impact": "May cause temporary access issues for legitimate users flagged as risky. Review process is necessary.",
+        "output": "Manual control",
+        "remediation": "1. Go to Identity Protection > Sign-in risk policy.\n2. Set the policy to block access for medium and high risk.\n3. Save and enable.",
+        "audit_ui": "1. Check Sign-in risk policy settings in Entra.\n2. Confirm action is set to Block for medium and high risk levels.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/entra/id-protection/howto-sign-in-risk-policy"
+        ]
+      },
+      {
+        "id": "5.2.2.10",
+        "level": "L1",
+        "title": "Ensure a managed device is required for authentication",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 1",
+        "description": "Conditional Access can be used to require that access is granted only from devices marked as compliant or hybrid Azure AD joined.",
+        "rationale": "Requiring managed devices reduces risk of access from unknown or potentially compromised endpoints.",
+        "impact": "Users will need to use enrolled and compliant devices to access resources.",
+        "output": "Manual control",
+        "remediation": "1. Go to Entra admin center > Protection > Conditional Access.\n2. Create a policy targeting All users.\n3. Under Conditions > Device platforms and filters, target unmanaged devices.\n4. Under Grant, select Require device to be marked as compliant.\n5. Enable and save the policy.",
+        "audit_ui": "1. Review Conditional Access policies.\n2. Ensure a policy requires compliant devices for access.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-policy-compliant-device"
+        ]
+      },
+      {
+        "id": "5.2.2.11",
+        "level": "L1",
+        "title": "Ensure a managed device is required for MFA registration",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 1",
+        "description": "Using Conditional Access, organizations can restrict MFA registration to trusted or managed devices. This ensures that only devices within control of the organization are used to enroll authentication factors.",
+        "rationale": "Restricting MFA registration to managed devices prevents unauthorized or untrusted devices from enrolling authentication methods, reducing risk of account takeover.",
+        "impact": "Users must use a compliant or hybrid Azure AD joined device to register for MFA. May require users to switch devices for registration.",
+        "output": "Manual control",
+        "remediation": "1. Go to Microsoft Entra admin center > Protection > Conditional Access.\n2. Create a new policy.\n3. Under Assignments > Users, select All users or targeted users.\n4. Under Cloud apps or actions, select User Actions > Register security information.\n5. Under Conditions > Filter for devices, include only compliant or hybrid joined devices.\n6. Under Grant, select Grant access and Require device to be marked as compliant.\n7. Enable and save the policy.",
+        "audit_ui": "1. Review Conditional Access policies.\n2. Check for a policy targeting 'Register security information' with compliant device requirement.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-policy-registration",
+          "https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-user-actions"
+        ]
+      },
+      {
+        "id": "5.2.3.1",
+        "level": "L1",
+        "title": "Ensure Microsoft Authenticator is configured to protect against MFA fatigue",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 1",
+        "description": "Microsoft Authenticator settings can be configured to reduce MFA fatigue attacks, such as push notification spamming. Number matching and additional context help validate legitimate authentication requests.",
+        "rationale": "MFA fatigue attacks rely on users approving repeated prompts without scrutiny. Number matching and context provide safeguards to prevent accidental approval of malicious attempts.",
+        "impact": "Users will be required to interact with their MFA app in more secure ways, which may slightly increase login time.",
+        "output": "Manual control",
+        "remediation": "1. Navigate to Microsoft Entra admin center > Protection > Authentication methods > Policies.\n2. Select Microsoft Authenticator.\n3. Enable and configure Number matching and Contextual information.\n4. Save changes.",
+        "audit_ui": "1. In Microsoft Entra admin center, navigate to Authentication methods > Policies.\n2. Confirm Number matching and Context are enabled for Microsoft Authenticator.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-mfa-number-match"
+        ]
+      },
+      {
+        "id": "5.2.3.2",
+        "level": "L1",
+        "title": "Ensure custom banned passwords lists are used",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 1",
+        "description": "Microsoft Entra ID Password Protection includes a global banned password list and allows administrators to define custom banned password lists to enhance protection.",
+        "rationale": "Adding organization-specific terms, such as company names, to the banned password list prevents the use of predictable and weak passwords.",
+        "impact": "Users may not be able to use preferred passwords if they match the banned list. This improves password strength but may require user education.",
+        "output": "Manual control",
+        "remediation": "1. Go to Microsoft Entra admin center > Protection > Authentication methods > Password protection.\n2. Under Custom banned passwords, add terms relevant to your organization.\n3. Save the policy.",
+        "audit_ui": "1. Navigate to Password protection in Entra.\n2. Review custom banned password entries under policy settings.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-password-ban-bad"
+        ]
+      },
+      {
+        "id": "5.2.3.3",
+        "level": "L1",
+        "title": "Ensure password protection is enabled for on-prem Active Directory",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 1",
+        "description": "Azure AD Password Protection for Windows Server enables enforcement of strong passwords on-premises using Microsoft’s banned password lists.",
+        "rationale": "Applying the same password protection on-premises and in the cloud ensures consistent enforcement and reduces the use of weak passwords across the hybrid environment.",
+        "impact": "Password change experience on-premises may be affected. Requires deployment of the password protection proxy and agents.",
+        "output": "Manual control",
+        "remediation": "1. Install Azure AD Password Protection proxy and agents.\n2. Configure the proxy to connect with Entra ID.\n3. Deploy and verify password protection policies on domain controllers.",
+        "audit_ui": "Review configuration on the server and proxy. Validate enforcement via password tests.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/azure/active-directory/authentication/howto-password-ban-bad-on-premises"
+        ]
+      },
+      {
+        "id": "5.2.3.4",
+        "level": "L1",
+        "title": "Ensure all member users are 'MFA capable'",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 1",
+        "description": "Ensure all users are capable of performing MFA using registered authentication methods such as phone number or app.",
+        "rationale": "Users not configured for MFA weaken the overall security posture and may remain vulnerable to phishing or credential theft.",
+        "impact": "Users must register at least one MFA method. Some training or support may be needed.",
+        "output": "Manual control",
+        "remediation": "1. In Microsoft Entra admin center, check user MFA registration status.\n2. Encourage or enforce users to register at least one MFA method.",
+        "audit_ui": "1. Navigate to Entra admin center > Users > Per-user MFA.\n2. Review the status column and ensure all users are Enabled or Enforced.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/entra/identity/authentication/howto-mfa-userstates"
+        ]
+      },
+      {
+        "id": "5.2.3.5",
+        "level": "L1",
+        "title": "Ensure weak authentication methods are disabled",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 1",
+        "description": "Weak authentication methods include SMS and voice calls. These are more susceptible to interception and social engineering compared to app-based or phishing-resistant options.",
+        "rationale": "Disabling weak methods enforces stronger authentication across the organization, reducing exposure to modern threat techniques.",
+        "impact": "Users using these methods will need to register more secure MFA alternatives such as Microsoft Authenticator.",
+        "output": "Manual control",
+        "remediation": "1. Go to Microsoft Entra admin center > Protection > Authentication methods.\n2. Under Policies, locate the method to be disabled (e.g., SMS).\n3. Set the Enable toggle to Off.\n4. Repeat for other weak methods.",
+        "audit_ui": "1. Navigate to Authentication methods > Policies.\n2. Verify weak methods like SMS and voice are disabled.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods"
+        ]
+      },
+      {
+        "id": "5.2.4.1",
+        "level": "L1",
+        "title": "Ensure 'Self service password reset enabled' is set to 'All'",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 1",
+        "description": "Self-service password reset (SSPR) allows users to reset their passwords without contacting IT. Enabling it for all users ensures timely access recovery and reduces helpdesk workload.",
+        "rationale": "Allowing users to securely reset their passwords improves user experience and reduces IT support demand. Enabling SSPR across the organization ensures consistent coverage.",
+        "impact": "Users must register authentication methods to use SSPR. Initial setup may require communication and training.",
+        "output": "Manual control",
+        "remediation": "1. Navigate to Microsoft Entra admin center https://entra.microsoft.com.\n2. Go to Protection > Password reset.\n3. Under Properties, set Self-service password reset enabled to All.\n4. Save the configuration.",
+        "audit_ui": "1. In Entra admin center > Protection > Password reset.\n2. Confirm that SSPR is enabled for All users.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-sspr-policy",
+          "https://learn.microsoft.com/en-us/entra/identity/authentication/howto-sspr-deployment"
+        ]
+      }
+    ]
+    
+    

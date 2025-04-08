@@ -1,0 +1,71 @@
+[
+    {
+      "id": "5.3.1",
+      "level": "L2",
+      "title": "Ensure 'Privileged Identity Management' is used to manage roles",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 2",
+      "description": "Privileged Identity Management (PIM) provides time-based and approval-based role activation to mitigate the risks of excessive, unnecessary, or misused access permissions.",
+      "rationale": "Using PIM ensures that privileged roles are only active when needed, reducing the attack surface and potential abuse.",
+      "impact": "Administrators will need to activate roles before performing privileged tasks. This may add steps to their workflow.",
+      "output": "Manual control",
+      "remediation": "1. Go to Microsoft Entra admin center > Identity Governance > Privileged Identity Management.\n2. On the Azure AD roles tab, discover roles in use.\n3. Assign eligible users and configure activation settings.\n4. Set up notifications, approval, and MFA requirements as needed.",
+      "audit_ui": "1. Navigate to Entra admin center > Identity Governance > PIM.\n2. Confirm roles are managed and users are eligible, not permanently active.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/azure/active-directory/privileged-identity-management/pim-configure"
+      ]
+    },
+    {
+      "id": "5.3.2",
+      "level": "L1",
+      "title": "Ensure 'Access reviews' for Guest Users are configured",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Access reviews allow organizations to regularly review and validate user access. Guest users should be reviewed periodically to remove inactive or unnecessary accounts.",
+      "rationale": "Regularly reviewing guest access ensures that only authorized external users retain access, minimizing risk.",
+      "impact": "Owners or reviewers must periodically review guest access. Automation can assist with enforcement.",
+      "output": "Manual control",
+      "remediation": "1. Navigate to Entra admin center > Identity Governance > Access reviews.\n2. Create a new review targeting Guests in directory roles or groups.\n3. Configure recurrence, scope, reviewers, and actions on no response.",
+      "audit_ui": "1. Go to Access reviews and confirm a recurring review for guest users is configured and active.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/azure/active-directory/governance/access-reviews-overview"
+      ]
+    },
+    {
+      "id": "5.3.3",
+      "level": "L1",
+      "title": "Ensure 'Access reviews' for privileged roles are configured",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Privileged roles should undergo periodic access reviews to ensure users with elevated access are still justified and active.",
+      "rationale": "Reviewing access to privileged roles helps prevent misuse and ensures access is appropriate and time-bound.",
+      "impact": "Administrative staff will need to validate privileged users periodically.",
+      "output": "Manual control",
+      "remediation": "1. Navigate to Entra admin center > Identity Governance > Access reviews.\n2. Create a review targeting roles such as Global Administrator, User Administrator, etc.\n3. Define schedule, reviewers, and remediation actions.",
+      "audit_ui": "1. Confirm an active and recurring access review exists for privileged roles.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/azure/active-directory/governance/access-reviews-overview"
+      ]
+    },
+    {
+      "id": "5.3.4",
+      "level": "L1",
+      "title": "Ensure approval is required for Global Administrator role activation",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "In PIM, requiring approval for role activation ensures oversight and prevents accidental or unauthorized use of highly privileged roles.",
+      "rationale": "Requiring approval adds a layer of control to role activation and helps meet audit and compliance goals.",
+      "impact": "Global Administrator role activations are delayed until approved by a designated reviewer.",
+      "output": "Manual control",
+      "remediation": "1. In Entra admin center > Identity Governance > PIM.\n2. Select Azure AD roles > Global Administrator.\n3. Under Settings > Role settings, enable Require approval to activate.\n4. Choose approvers and save.",
+      "audit_ui": "1. Navigate to PIM > Azure AD roles > Global Administrator.\n2. Check that 'Require approval to activate' is enabled.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/azure/active-directory/privileged-identity-management/pim-how-to-require-approval"
+      ]
+    }
+  ]
+  

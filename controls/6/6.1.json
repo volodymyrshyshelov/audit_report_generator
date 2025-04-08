@@ -1,0 +1,71 @@
+[
+    {
+      "id": "6.1.1",
+      "level": "L1",
+      "title": "Ensure 'AuditDisabled' organizationally is set to 'False'",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "The AuditDisabled parameter determines whether auditing is turned off at the organizational level. Setting it to False ensures auditing is active across the organization.",
+      "rationale": "Disabling audit logging prevents tracking of mailbox access and other security-relevant events, reducing forensic and investigative capabilities.",
+      "impact": "Enabling auditing may increase log storage and management requirements but improves accountability and visibility.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "To remediate using PowerShell:\n1. Connect to Exchange Online using Connect-ExchangeOnline.\n2. Run:\nSet-OrganizationConfig -AuditDisabled $false",
+      "audit_ui": "No UI available for this setting.",
+      "audit_powershell": "Connect-ExchangeOnline\nGet-OrganizationConfig | Format-List AuditDisabled\nEnsure AuditDisabled is False.",
+      "references": [
+        "https://learn.microsoft.com/en-us/powershell/module/exchange/set-organizationconfig?view=exchange-ps"
+      ]
+    },
+    {
+      "id": "6.1.2",
+      "level": "L1",
+      "title": "Ensure mailbox auditing for E3 users is Enabled",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "Mailbox audit logging records actions taken by users on mailboxes. Enabling it ensures that security-related actions are logged and available for review.",
+      "rationale": "Audit logs help detect malicious or unauthorized activity, supporting investigations and compliance monitoring.",
+      "impact": "Audit data will be generated and retained. Ensure appropriate retention and storage practices are in place.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "Connect to Exchange Online and run:\nGet-Mailbox -ResultSize Unlimited | Where-Object { $_.SkuPartNumber -like '*ENTERPRISEPACK*' } | Set-Mailbox -AuditEnabled $true",
+      "audit_ui": "No direct UI option for batch audit enablement.",
+      "audit_powershell": "Connect-ExchangeOnline\nGet-Mailbox -ResultSize Unlimited | Where-Object { $_.SkuPartNumber -like '*ENTERPRISEPACK*' } | Format-Table Name, AuditEnabled",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-365/compliance/enable-mailbox-auditing?view=o365-worldwide"
+      ]
+    },
+    {
+      "id": "6.1.3",
+      "level": "L1",
+      "title": "Ensure mailbox auditing for E5 users is Enabled",
+      "type": "Automated",
+      "profile_applicability": "E5 Level 1",
+      "description": "Mailbox auditing for users with E5 licenses must be explicitly checked to ensure it is active and capturing appropriate events.",
+      "rationale": "Auditing mailbox activity helps ensure transparency and accountability, especially for sensitive or high-privilege accounts.",
+      "impact": "Log data will increase with more mailboxes audited. Review retention settings to avoid excessive storage.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "Connect to Exchange Online and run:\nGet-Mailbox -ResultSize Unlimited | Where-Object { $_.SkuPartNumber -like '*ENTERPRISEPREMIUM*' } | Set-Mailbox -AuditEnabled $true",
+      "audit_ui": "Not available. Use PowerShell.",
+      "audit_powershell": "Connect-ExchangeOnline\nGet-Mailbox -ResultSize Unlimited | Where-Object { $_.SkuPartNumber -like '*ENTERPRISEPREMIUM*' } | Format-Table Name, AuditEnabled",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-365/compliance/enable-mailbox-auditing?view=o365-worldwide"
+      ]
+    },
+    {
+      "id": "6.1.4",
+      "level": "L1",
+      "title": "Ensure 'AuditBypassEnabled' is not enabled on mailboxes",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "The AuditBypassEnabled flag allows actions on a mailbox to bypass audit logging. Ensuring it is disabled guarantees all actions are captured in the audit logs.",
+      "rationale": "Bypassing audit logging weakens the organization’s ability to detect and respond to inappropriate access or behavior.",
+      "impact": "Ensures consistent auditing across all mailboxes. No negative user impact expected.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "Connect to Exchange Online and run:\nGet-Mailbox -ResultSize Unlimited | Where-Object { $_.AuditBypassEnabled -eq $true } | Set-Mailbox -AuditBypassEnabled $false",
+      "audit_ui": "Not visible in UI. Use PowerShell.",
+      "audit_powershell": "Connect-ExchangeOnline\nGet-Mailbox -ResultSize Unlimited | Where-Object { $_.AuditBypassEnabled -eq $true } | Format-Table Name, AuditBypassEnabled",
+      "references": [
+        "https://learn.microsoft.com/en-us/powershell/module/exchange/set-mailbox?view=exchange-ps"
+      ]
+    }
+  ]
+  

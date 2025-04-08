@@ -1,0 +1,19 @@
+[
+    {
+      "id": "8.6.1",
+      "level": "L1",
+      "title": "Ensure users can report security concerns in Teams",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "Enabling reporting of security concerns allows users to report suspicious messages in Microsoft Teams, which can then be analyzed by Microsoft Defender for Office 365.",
+      "rationale": "User-reported messages provide valuable signals for identifying phishing and other malicious content.",
+      "impact": "Users will have the option to report Teams messages, enhancing the organization’s threat visibility.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "1. Go to Microsoft Defender portal > Email & collaboration > Policies & rules > Threat policies.\n2. Select User reported settings.\n3. Under Microsoft Teams, toggle 'Let users report security issues in Teams' to On.\n4. Save the configuration.",
+      "audit_ui": "Microsoft Defender portal > Email & collaboration > Policies & rules > Threat policies > User reported settings\nVerify Teams reporting toggle is enabled.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/enable-the-report-message-add-in?view=o365-worldwide#user-reported-settings"
+      ]
+    }
+  ]

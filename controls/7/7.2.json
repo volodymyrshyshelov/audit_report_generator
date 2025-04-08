@@ -1,0 +1,190 @@
+[
+    {
+      "id": "7.2.1",
+      "level": "L1",
+      "title": "Ensure modern authentication for SharePoint applications is required",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "Modern authentication for SharePoint Online uses OAuth 2.0, enabling features like MFA and Conditional Access. This setting should be enforced for security.",
+      "rationale": "Modern authentication supports advanced security features and eliminates older, less secure protocols.",
+      "impact": "Legacy clients that do not support modern authentication will no longer connect.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "Run in SharePoint Online Management Shell:\nSet-SPOTenant -LegacyAuthProtocolsEnabled $false",
+      "audit_ui": "No UI. Must be audited via PowerShell.",
+      "audit_powershell": "Connect-SPOService\nGet-SPOTenant | Format-List LegacyAuthProtocolsEnabled\nEnsure result is False.",
+      "references": [
+        "https://learn.microsoft.com/en-us/powershell/module/sharepoint-online/set-spotenant"
+      ]
+    },
+    {
+      "id": "7.2.2",
+      "level": "L1",
+      "title": "Ensure SharePoint and OneDrive integration with Azure AD B2B is enabled",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "This setting enables external sharing with Azure AD B2B, allowing guest users to be managed through Conditional Access and compliance policies.",
+      "rationale": "Using Azure AD B2B ensures external users are brought under organizational policy and identity controls.",
+      "impact": "External collaboration will be better controlled and auditable.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "Set-SPOTenant -EnableAzureADB2BIntegration $true",
+      "audit_ui": "Microsoft 365 admin center > Settings > Org settings > SharePoint\nConfirm Azure AD B2B integration is enabled.",
+      "audit_powershell": "Connect-SPOService\nGet-SPOTenant | Format-List EnableAzureADB2BIntegration\nEnsure result is True.",
+      "references": [
+        "https://learn.microsoft.com/en-us/sharepoint/sharepoint-azureb2b-integration"
+      ]
+    },
+    {
+      "id": "7.2.3",
+      "level": "L1",
+      "title": "Ensure external content sharing is restricted",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "Limits how content can be shared externally in SharePoint and OneDrive. Recommended value is 'Existing guests' to prevent anonymous links.",
+      "rationale": "Restricting sharing helps protect data from unauthorized access and ensures shared content is traceable.",
+      "impact": "Users may need to invite guests before sharing content, improving accountability.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "Set-SPOTenant -SharingCapability ExternalUserSharingOnly",
+      "audit_ui": "SharePoint admin center > Policies > Sharing\nVerify external sharing is set to 'Existing guests only'.",
+      "audit_powershell": "Connect-SPOService\nGet-SPOTenant | Format-List SharingCapability\nEnsure it is set to 2 (ExternalUserSharingOnly).",
+      "references": [
+        "https://learn.microsoft.com/en-us/sharepoint/external-sharing-overview"
+      ]
+    },
+    {
+      "id": "7.2.4",
+      "level": "L2",
+      "title": "Ensure OneDrive content sharing is restricted",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 2",
+      "description": "Restrict OneDrive content sharing to prevent anonymous access and limit external sharing to trusted guests.",
+      "rationale": "Tightening OneDrive sharing controls reduces the risk of data loss or leakage via unrestricted sharing.",
+      "impact": "Users may lose the ability to use anonymous links and need to use managed guest access instead.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "Set-SPOTenant -ODAnonymousLinkEnabled $false",
+      "audit_ui": "SharePoint admin center > Policies > Sharing\nUnder OneDrive, ensure 'Only people in your organization' or 'Existing guests' is selected.",
+      "audit_powershell": "Connect-SPOService\nGet-SPOTenant | Format-List ODAnonymousLinkEnabled\nEnsure result is False.",
+      "references": [
+        "https://learn.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off"
+      ]
+    },
+    {
+      "id": "7.2.5",
+      "level": "L2",
+      "title": "Ensure that SharePoint guest users cannot share items they don't own",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 2",
+      "description": "This policy restricts guests from sharing content that they do not own, limiting unintended distribution of data.",
+      "rationale": "Restricting guest sharing capabilities mitigates the risk of oversharing and data leakage.",
+      "impact": "Guest users will be limited to sharing only content they own, enforcing more controlled collaboration.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "Set-SPOTenant -PreventGuestUsersFromSharingOwnedByOthers $true",
+      "audit_ui": "SharePoint admin center > Policies > Sharing\nEnsure guest users cannot share content they do not own.",
+      "audit_powershell": "Connect-SPOService\nGet-SPOTenant | Format-List PreventGuestUsersFromSharingOwnedByOthers\nEnsure result is True.",
+      "references": [
+        "https://learn.microsoft.com/en-us/powershell/module/sharepoint-online/set-spotenant?view=sharepoint-ps"
+      ]
+    },
+    {
+        "id": "7.2.6",
+        "level": "L2",
+        "title": "Ensure SharePoint external sharing is managed through domain whitelist/blacklists",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 2",
+        "description": "SharePoint allows configuration of domain-based restrictions to control which external domains users can share content with.",
+        "rationale": "Limiting external sharing by domain reduces the risk of data leaks to untrusted parties and enforces organizational boundaries.",
+        "impact": "Users will only be able to share with partners on the allow list or prevented from sharing with domains on the block list.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Run in SharePoint Online PowerShell:\nSet-SPOTenant -SharingDomainRestrictionMode AllowList -SharingAllowedDomainList 'domain.com'",
+        "audit_ui": "SharePoint admin center > Policies > Sharing\nReview domain restriction settings.",
+        "audit_powershell": "Connect-SPOService\nGet-SPOTenant | Format-List SharingDomainRestrictionMode, SharingAllowedDomainList\nVerify AllowList or BlockList mode and domains.",
+        "references": [
+          "https://learn.microsoft.com/en-us/sharepoint/external-sharing-overview"
+        ]
+      },
+      {
+        "id": "7.2.7",
+        "level": "L1",
+        "title": "Ensure link sharing is restricted in SharePoint and OneDrive",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "Controls the default link type when users share content. Recommended setting is to require specific people links.",
+        "rationale": "Restricting link types reduces unintentional or unrestricted sharing with external parties.",
+        "impact": "Users will need to explicitly define recipients when sharing files.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Set-SPOTenant -DefaultSharingLinkType Direct",
+        "audit_ui": "SharePoint admin center > Policies > Sharing\nCheck 'Default link type' is set to 'Specific people'.",
+        "audit_powershell": "Connect-SPOService\nGet-SPOTenant | Format-List DefaultSharingLinkType\nEnsure value is set to 'Direct'.",
+        "references": [
+          "https://learn.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off"
+        ]
+      },
+      {
+        "id": "7.2.8",
+        "level": "L2",
+        "title": "Ensure external sharing is restricted by security group",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 2",
+        "description": "Limits who can share content externally by requiring users to be members of a security group.",
+        "rationale": "Controlling external sharing permissions reduces data leakage and ensures only authorized users can share externally.",
+        "impact": "Users not in the approved group will be unable to initiate external shares.",
+        "output": "Manual control",
+        "remediation": "1. Navigate to SharePoint admin center > Policies > Sharing.\n2. Under 'Who can share externally', select 'Only people in selected security groups'.\n3. Add the designated security group(s).\n4. Save the settings.",
+        "audit_ui": "Confirm in SharePoint admin center that sharing permissions are limited by security group.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/sharepoint/external-sharing-overview"
+        ]
+      },
+      {
+        "id": "7.2.9",
+        "level": "L1",
+        "title": "Ensure guest access to a site or OneDrive will expire automatically",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "Guest access expiration ensures external access is time-limited and requires review for renewal.",
+        "rationale": "Automatically expiring guest access reduces risk of forgotten and unused accounts lingering with data access.",
+        "impact": "Guests will lose access unless renewed by site owners. This adds a layer of review and revalidation.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Set-SPOTenant -ExternalUserExpireInDays 30",
+        "audit_ui": "SharePoint admin center > Policies > Sharing\nCheck 'Guest access expiration' is set and a value in days is configured.",
+        "audit_powershell": "Connect-SPOService\nGet-SPOTenant | Format-List ExternalUserExpireInDays\nEnsure value is not null or 0.",
+        "references": [
+          "https://learn.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off"
+        ]
+      },
+      {
+        "id": "7.2.10",
+        "level": "L1",
+        "title": "Ensure reauthentication with verification code is restricted",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "Restricting reauthentication via email code ensures stronger verification methods like sign-in with organizational credentials.",
+        "rationale": "Email-based verification can be spoofed or intercepted. Using stronger auth mechanisms improves security.",
+        "impact": "Guests must use Azure AD or Microsoft accounts instead of re-verification via email.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Set-SPOTenant -ShowPeoplePickerSuggestionsForGuestUsersOnly $false",
+        "audit_ui": "No UI available for this setting.",
+        "audit_powershell": "Connect-SPOService\nGet-SPOTenant | Format-List ShowPeoplePickerSuggestionsForGuestUsersOnly\nEnsure result is False.",
+        "references": [
+          "https://learn.microsoft.com/en-us/sharepoint/restrict-guest-access"
+        ]
+      },
+      {
+        "id": "7.2.11",
+        "level": "L1",
+        "title": "Ensure the SharePoint default sharing link permission is set",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "This setting defines whether shared links provide view or edit access by default. Set to 'View' to minimize unintended editing.",
+        "rationale": "Setting link permissions to 'View' prevents accidental edits and enforces least privilege.",
+        "impact": "Users may need to manually switch link permissions if editing is required.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Set-SPOTenant -DefaultSharingLinkPermission View",
+        "audit_ui": "SharePoint admin center > Policies > Sharing\nCheck 'Default permission for sharing links' is set to 'View'.",
+        "audit_powershell": "Connect-SPOService\nGet-SPOTenant | Format-List DefaultSharingLinkPermission\nEnsure value is 'View'.",
+        "references": [
+          "https://learn.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off"
+        ]
+      }
+    ]
+  

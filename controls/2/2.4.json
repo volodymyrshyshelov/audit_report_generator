@@ -1,0 +1,78 @@
+[
+    {
+      "id": "2.4.1",
+      "level": "L1",
+      "title": "Ensure Priority account protection is enabled and configured",
+      "type": "Manual",
+      "profile_applicability": "E5 Level 1",
+      "description": "Identify priority accounts to utilize Microsoft 365's advanced custom security features. Once these accounts are identified, enable services and features such as threat policies, conditional access policies, and alert policies to enhance security for users in critical roles.",
+      "rationale": "Priority accounts such as executives and IT admins are high-value targets. Microsoft 365 provides additional controls to detect and respond to threats specific to these users, such as alerts for impersonation or high-risk access.",
+      "impact": "Configuration of priority account protection may require coordination across IT and security teams and updates to alerting workflows.",
+      "output": "Manual control",
+      "remediation": "Step 1: Enable protection:\n1. Navigate to https://security.microsoft.com.\n2. Go to System > Settings > E-mail & collaboration > Priority account protection.\n3. Set protection to On.\nStep 2: Tag accounts:\n4. Select User tags > PRIORITY ACCOUNT > Edit.\n5. Add users or groups.\nStep 3: Create alert policy:\n6. Go to E-mail & collaboration > Alert policy.\n7. Create policies with severity High and appropriate tags (e.g. Priority account).",
+      "audit_ui": "1. Navigate to https://security.microsoft.com.\n2. Check that Priority account protection is enabled under E-mail & collaboration.\n3. Under User tags, ensure correct members are assigned.\n4. Under Alert policy, verify alerts exist for tagged accounts.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-365/admin/setup/priority-accounts",
+        "https://learn.microsoft.com/en-us/defender-office-365/priority-accounts-security-recommendations"
+      ]
+    },
+    {
+      "id": "2.4.2",
+      "level": "L1",
+      "title": "Ensure Priority accounts have 'Strict protection' presets applied",
+      "type": "Manual",
+      "profile_applicability": "E5 Level 1",
+      "description": "Microsoft offers preset security policies to help mitigate spam, malware, and phishing. Strict protection includes maximum enforcement across EOP and Defender controls and is recommended for priority accounts.",
+      "rationale": "Priority accounts need the strongest available security posture. The strict preset applies layers of defense such as Safe Links, Safe Attachments, spoof and impersonation protections.",
+      "impact": "Strict presets may increase false positives and disrupt email flow for priority users if not fine-tuned.",
+      "output": "Manual control",
+      "remediation": "1. Navigate to https://security.microsoft.com.\n2. Go to E-mail & collaboration > Threat policies > Preset security policies.\n3. Select Strict protection > Manage protection settings.\n4. Apply policies to groups including priority accounts.\n5. Configure impersonation and domain settings.\n6. Confirm and enable policy.",
+      "audit_ui": "1. Navigate to https://security.microsoft.com.\n2. Review Threat policies for Strict protection.\n3. Verify it applies to groups containing priority accounts.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/defender-office-365/preset-security-policies?view=o365-worldwide",
+        "https://learn.microsoft.com/en-us/defender-office-365/priority-accounts-security-recommendations",
+        "https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365?view=o365-worldwide#impersonation-settings-in-anti-phishing-policies-in-microsoft-defender-for-office-365"
+      ]
+    },
+    {
+      "id": "2.4.3",
+      "level": "L2",
+      "title": "Ensure Microsoft Defender for Cloud Apps is enabled and configured",
+      "type": "Manual",
+      "profile_applicability": "E5 Level 2",
+      "description": "Defender for Cloud Apps provides visibility into suspicious activity in Microsoft 365. It includes threat detection such as impossible travel, mass file access, and anonymous login. Integration with Microsoft Defender enables proactive remediation.",
+      "rationale": "Cloud App Security allows organizations to detect and respond to anomalies across Office 365, Azure, and third-party apps. It integrates with Conditional Access and Microsoft Defender for Endpoint.",
+      "impact": "May require license upgrades and coordination with multiple admin teams. False positives possible without tuning.",
+      "output": "Manual control",
+      "remediation": "1. Go to https://security.microsoft.com.\n2. Navigate to System > Settings > Cloud apps.\n3. Connect Office 365 and Azure via App connectors.\n4. Enable file monitoring under Information Protection.\n5. Enable Defender for Endpoint integration under Cloud Discovery.",
+      "audit_ui": "1. Visit https://security.microsoft.com.\n2. Go to Settings > Cloud apps.\n3. Verify Office 365 and Azure appear under Connected Apps.\n4. Verify File Monitoring is enabled.\n5. Confirm Microsoft Defender for Endpoint is active.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/defender-cloud-apps/protect-office-365#connect-microsoft-365-to-microsoft-defender-for-cloud-apps",
+        "https://learn.microsoft.com/en-us/defender-cloud-apps/protect-azure#connect-azure-to-microsoft-defender-for-cloud-apps",
+        "https://learn.microsoft.com/en-us/defender-cloud-apps/best-practices",
+        "https://learn.microsoft.com/en-us/defender-cloud-apps/get-started"
+      ]
+    },
+    {
+      "id": "2.4.4",
+      "level": "L1",
+      "title": "Ensure Zero-hour auto purge for Microsoft Teams is on",
+      "type": "Automated",
+      "profile_applicability": "E5 Level 1",
+      "description": "ZAP for Teams protects against malware and phishing by removing delivered messages that are later identified as malicious. When ZAP blocks a message, it is removed for all participants.",
+      "rationale": "ZAP provides retroactive remediation for evolving threats. Teams messages delivered but later deemed unsafe are purged to prevent exposure.",
+      "impact": "Potential for false positives. ZAP may remove legitimate messages if they are misclassified.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "UI:\n1. Go to https://security.microsoft.com.\n2. Expand System > Settings > Email & collaboration > Microsoft Teams protection.\n3. Set ZAP to On.\nPowerShell:\nConnect-ExchangeOnline\nSet-TeamsProtectionPolicy -Identity \"Teams Protection Policy\" -ZapEnabled $true",
+      "audit_ui": "1. Go to https://security.microsoft.com.\n2. Navigate to Settings > Email & collaboration > Microsoft Teams protection.\n3. Ensure ZAP is On.\n4. Review participant exclusions for justification.",
+      "audit_powershell": "Connect-ExchangeOnline\nGet-TeamsProtectionPolicy | fl ZapEnabled\nGet-TeamsProtectionPolicyRule | fl ExceptIf*\nEnsure ZAP is enabled and exclusions are justified.",
+      "references": [
+        "https://learn.microsoft.com/en-us/defender-office-365/zero-hour-auto-purge?view=o365-worldwide#zero-hour-auto-purge-zap-in-microsoft-teams",
+        "https://learn.microsoft.com/en-us/defender-office-365/mdo-support-teams-about?view=o365-worldwide#configure-zap-for-teams-protection-in-defender-for-office-365-plan-2"
+      ]
+    }
+  ]
+  

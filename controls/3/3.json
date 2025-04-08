@@ -1,0 +1,73 @@
+[
+    {
+      "id": "3.1.1",
+      "level": "L1",
+      "title": "Ensure Microsoft 365 audit log search is Enabled",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "When audit log search is enabled in the Microsoft Purview compliance portal, user and admin activity within the organization is recorded in the audit log and retained for 90 days. However, some organizations may prefer to use a third-party security information and event management (SIEM) application to access their auditing data. In this scenario, a global admin can choose to turn off audit log search in Microsoft 365.",
+      "rationale": "Enabling audit log search in the Microsoft Purview compliance portal can help organizations improve their security posture, meet regulatory compliance requirements, respond to security incidents, and gain valuable operational insights.",
+      "impact": "Minimal. Audit logs consume minimal space and performance impact is negligible.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "To remediate using the UI:\n1. Navigate to Microsoft Purview https://compliance.microsoft.com.\n2. Select Audit to open the audit search.\n3. Click Start recording user and admin activity next to the information warning at the top.\n4. Click Yes on the dialog box to confirm.\n\nTo remediate using PowerShell:\n1. Connect to Exchange Online using Connect-ExchangeOnline.\n2. Run the following PowerShell command:\nSet-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true",
+      "audit_ui": "1. Navigate to Microsoft Purview https://compliance.microsoft.com.\n2. Select Audit to open the audit search.\n3. Choose a date and time frame in the past 30 days.\n4. Verify search capabilities (e.g. try searching for Activities as Accessed file and results should be displayed).",
+      "audit_powershell": "1. Connect to Exchange Online using Connect-ExchangeOnline.\n2. Run the following PowerShell command:\nGet-AdminAuditLogConfig | Select-Object UnifiedAuditLogIngestionEnabled\n3. Ensure UnifiedAuditLogIngestionEnabled is set to True.",
+      "references": [
+        "https://learn.microsoft.com/en-us/purview/audit-log-enable-disable?view=o365-worldwide",
+        "https://learn.microsoft.com/en-us/powershell/module/exchange/set-adminauditlogconfig?view=exchange-ps"
+      ]
+    },
+    {
+      "id": "3.2.1",
+      "level": "L1",
+      "title": "Ensure DLP policies are enabled",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Data Loss Prevention (DLP) policies help prevent unintentional exposure of sensitive data. DLP rules inspect content and enforce actions like blocking, alerting, or encrypting messages.",
+      "rationale": "DLP helps enforce compliance with data privacy regulations and reduces the risk of data leakage.",
+      "impact": "Users may receive policy tips and encounter blocked actions when sensitive data is detected.",
+      "output": "Manual control",
+      "remediation": "1. Go to https://compliance.microsoft.com.\n2. Expand Solutions > Data loss prevention.\n3. Click Policies and create or edit a policy.\n4. Select a template (e.g., Financial, HIPAA), configure conditions, and set enforcement actions.\n5. Enable the policy and apply it to Exchange, SharePoint, OneDrive, or Teams.",
+      "audit_ui": "1. Navigate to https://compliance.microsoft.com.\n2. Go to Data loss prevention > Policies.\n3. Confirm there is at least one policy enabled and applied.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-365/compliance/data-loss-prevention-policies?view=o365-worldwide"
+      ]
+    },
+    {
+      "id": "3.2.2",
+      "level": "L1",
+      "title": "Ensure DLP policies are enabled for Microsoft Teams",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "DLP policies can protect data in Teams by preventing the sharing of sensitive info through messages or files. Policies can block messages, restrict sharing, and alert users or admins.",
+      "rationale": "Teams is a collaboration platform where data can be exposed. Applying DLP here extends data protection to chat and channel messages.",
+      "impact": "Blocking messages or files may disrupt collaboration if policies are too strict.",
+      "output": "Manual control",
+      "remediation": "1. Go to https://compliance.microsoft.com.\n2. Navigate to Data loss prevention > Policies.\n3. Create or edit a policy.\n4. Under Locations, select Microsoft Teams chat and channel messages.\n5. Apply conditions and enforcement actions, then enable the policy.",
+      "audit_ui": "1. Navigate to https://compliance.microsoft.com.\n2. Check Data loss prevention policies.\n3. Confirm at least one policy applies to Microsoft Teams chat and channel messages.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-365/compliance/dlp-microsoft-teams?view=o365-worldwide"
+      ]
+    },
+    {
+      "id": "3.3.1",
+      "level": "L1",
+      "title": "Ensure SharePoint Online Information Protection policies are set up and used",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Sensitivity labels and retention policies applied to SharePoint sites help classify, protect, and manage data. These can control access, encrypt files, and enforce retention rules.",
+      "rationale": "SharePoint stores a large volume of business data. Without classification or protection, sensitive information may be leaked or deleted inappropriately.",
+      "impact": "Policies may restrict access or enforce retention, which can affect user experience if misconfigured.",
+      "output": "Manual control",
+      "remediation": "1. Go to https://compliance.microsoft.com.\n2. Navigate to Information protection > Labels.\n3. Create sensitivity labels and publish them to SharePoint Online.\n4. Optionally configure auto-labeling policies.\n5. Also review retention policies under Data lifecycle management.",
+      "audit_ui": "1. Go to https://compliance.microsoft.com.\n2. Under Information protection, review labels and policies.\n3. Verify published labels are applied to SharePoint sites.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-365/compliance/sensitivity-labels-sharepoint-onedrive-files?view=o365-worldwide",
+        "https://learn.microsoft.com/en-us/microsoft-365/compliance/create-sensitivity-labels?view=o365-worldwide"
+      ]
+    }
+  ]
+  

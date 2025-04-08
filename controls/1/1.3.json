@@ -1,0 +1,142 @@
+[
+    {
+      "id": "1.3.1",
+      "level": "L1",
+      "title": "Ensure the 'Password expiration policy' is set to 'Set passwords to never expire (recommended)'",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "Microsoft cloud-only accounts have a predefined password policy that cannot be customized except for the expiration setting. The only configurable options are whether passwords expire and the expiration period.",
+      "rationale": "Organizations like NIST and Microsoft recommend against arbitrary password changes unless there's evidence of compromise. Forcing frequent changes often results in weaker passwords. When MFA and password protection are in place, password expiration becomes less beneficial.",
+      "impact": "While setting passwords to never expire, it’s critical to implement other security measures: banning common passwords, educating users on password reuse, and enforcing MFA for all users.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Expand Settings > Org Settings.\n3. Click Security & privacy.\n4. Select Password expiration policy and check 'Set passwords to never expire (recommended)'.\n5. Click Save.",
+      "audit_ui": "1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Expand Settings > Org Settings.\n3. Click on Security & privacy.\n4. Select Password expiration policy and ensure the box 'Set passwords to never expire (recommended)' is checked.",
+      "audit_powershell": "Connect-MgGraph -Scopes 'Domain.Read.All'\nGet-MgDomain | ft id,PasswordValidityPeriodInDays\nVerify that the value is 2147483647 for all valid domains.",
+      "references": [
+        "https://pages.nist.gov/800-63-3/sp800-63b.html",
+        "https://www.cisecurity.org/white-papers/cis-password-policy-guide/",
+        "https://learn.microsoft.com/en-us/microsoft-365/admin/misc/password-policy-recommendations?view=o365-worldwide"
+      ]
+    },
+    {
+      "id": "1.3.2",
+      "level": "L1",
+      "title": "Ensure 'Idle session timeout' is set to '3 hours (or less)' for unmanaged devices",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Idle session timeout policies help limit the amount of time a session can remain open on unmanaged devices after user inactivity. This control applies only to Microsoft 365 web apps accessed via browsers on unmanaged devices.",
+      "rationale": "This control helps reduce exposure from sessions left open by end-users on unmanaged machines, particularly in public or shared computing environments.",
+      "impact": "Users on unmanaged devices will be prompted to re-authenticate after being idle for 3 hours or less, which may cause interruptions.",
+      "output": "Manual control",
+      "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Expand Settings > Org settings.\n3. Click on Security & privacy > Idle session timeout.\n4. Check the box for ‘Sign out inactive users on unmanaged devices after a period of inactivity’.\n5. Set the time to 3 hours or less.\n6. Click Save.",
+      "audit_ui": "1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Expand Settings > Org settings.\n3. Click on Security & privacy > Idle session timeout.\n4. Verify the setting is enabled and configured to 3 hours or less.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-365/admin/security-and-compliance/set-idle-session-timeout?view=o365-worldwide"
+      ]
+    },
+    {
+      "id": "1.3.3",
+      "level": "L2",
+      "title": "Ensure 'External sharing' of calendars is not available",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 2",
+      "description": "Restricting calendar sharing to people inside the organization helps prevent accidental disclosure of sensitive data like meeting titles, participants, or locations.",
+      "rationale": "When calendar data is shared externally, sensitive business details may be exposed to unintended recipients. Disabling external calendar sharing ensures information remains internal.",
+      "impact": "Users will no longer be able to share calendar availability or events with external contacts.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "To remediate using the UI:\n1. Navigate to Exchange admin center https://admin.exchange.microsoft.com.\n2. Expand Organization > Sharing.\n3. Set Calendar publishing to Off.\n4. Click Save.",
+      "audit_ui": "1. Navigate to Exchange admin center https://admin.exchange.microsoft.com.\n2. Expand Organization > Sharing.\n3. Ensure calendar sharing options are disabled for external recipients.",
+      "audit_powershell": "Connect-ExchangeOnline\nGet-SharingPolicy | fl Identity, Domains\nEnsure the default policy does not include external domains or is set to 'None'.",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-365/admin/manage/share-calendars-with-external-users?view=o365-worldwide"
+      ]
+    },
+    {
+      "id": "1.3.4",
+      "level": "L1",
+      "title": "Ensure 'User owned apps and services' is restricted",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "User-controlled applications and services may introduce risks if users install or authorize apps that have broad access to organizational data. This setting prevents users from registering custom-developed apps or granting excessive permissions.",
+      "rationale": "Restricting user-owned applications prevents data leakage and unauthorized access. This helps enforce least privilege and limits the risk posed by malicious or misconfigured third-party integrations.",
+      "impact": "Users will be unable to add their own applications or services that require administrative permissions or broad data access.",
+      "output": "Manual control",
+      "remediation": "To remediate using the UI:\n1. Navigate to Microsoft Entra admin center https://entra.microsoft.com.\n2. Expand Identity > Applications > User settings.\n3. Under App registrations, select 'No' for the setting 'Users can register applications'.\n4. Click Save.",
+      "audit_ui": "1. Navigate to Microsoft Entra admin center https://entra.microsoft.com.\n2. Expand Identity > Applications > User settings.\n3. Verify that 'Users can register applications' is set to 'No'.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-365/admin/manage/manage-addins-in-the-admin-center?view=o365-worldwide#manage-add-in-downloads-by-turning-onoff-the-office-store-across-all-apps-except-outlook"
+      ]
+    },
+    {
+        "id": "1.3.5",
+        "level": "L1",
+        "title": "Ensure internal phishing protection for Forms is enabled",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 1",
+        "description": "Microsoft Forms can be used for phishing attacks by asking personal or sensitive information and collecting the results. Microsoft 365 has built-in protection that will proactively scan for phishing attempts in forms such as personal information requests.",
+        "rationale": "Enabling internal phishing protection for Microsoft Forms prevents attackers from using forms to request sensitive data, thereby reducing the risk of internal phishing.",
+        "impact": "If phishing is detected, the form will be temporarily blocked from distribution and response collection until reviewed by an administrator or the creator adjusts flagged content.",
+        "output": "Manual control",
+        "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Expand Settings > Org settings.\n3. Under Services select Microsoft Forms.\n4. Enable the checkbox labeled 'Add internal phishing protection' under Phishing protection.\n5. Click Save.",
+        "audit_ui": "1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Expand Settings > Org settings.\n3. Under Services select Microsoft Forms.\n4. Ensure the checkbox labeled 'Add internal phishing protection' is checked under Phishing protection.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/microsoft-forms/administrator-settings-microsoft-forms",
+          "https://learn.microsoft.com/en-us/microsoft-forms/review-unblock-forms-users-detected-blocked-potential-phishing"
+        ]
+      },
+      {
+        "id": "1.3.6",
+        "level": "L2",
+        "title": "Ensure the customer lockbox feature is enabled",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 2",
+        "description": "Customer Lockbox is a security feature that provides an additional layer of control and transparency to customer data in Microsoft 365. It offers an approval process for Microsoft support personnel to access organization data and creates an audited trail to meet compliance requirements.",
+        "rationale": "Enabling this feature protects organizational data against data spillage and exfiltration by ensuring Microsoft support must request and receive explicit access approval.",
+        "impact": "Administrators will need to approve Microsoft access requests before engineers can proceed, potentially delaying support resolution times.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Expand Settings > Org settings.\n3. Select Security & privacy.\n4. Click Customer lockbox.\n5. Check the box 'Require approval for all data access requests'.\n6. Click Save.\nTo remediate using PowerShell:\n1. Connect to Exchange Online using Connect-ExchangeOnline.\n2. Run: Set-OrganizationConfig -CustomerLockBoxEnabled $true",
+        "audit_ui": "1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Expand Settings > Org settings.\n3. Select Security & privacy.\n4. Click Customer lockbox.\n5. Ensure the box labeled 'Require approval for all data access requests' is checked.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-OrganizationConfig | Select-Object CustomerLockBoxEnabled\nEnsure the value is True.",
+        "references": [
+          "https://learn.microsoft.com/en-us/azure/security/fundamentals/customer-lockbox-overview"
+        ]
+      },
+      {
+        "id": "1.3.7",
+        "level": "L2",
+        "title": "Ensure 'third-party storage services' are restricted in 'Microsoft 365 on the web'",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 2",
+        "description": "Third-party storage can be enabled for users in Microsoft 365, allowing them to store and share documents using services such as Dropbox, alongside OneDrive and team sites.",
+        "rationale": "By using external storage services, an organization may increase the risk of data breaches and unauthorized access to confidential information. Third-party services may not adhere to the organization's security standards, complicating data privacy and security enforcement.",
+        "impact": "If users regularly utilize external storage providers, this setting may disrupt their workflows. Minimal impact if such providers are not in use.",
+        "output": "Manual control",
+        "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Go to Settings > Org Settings > Services > Microsoft 365 on the web.\n3. Uncheck the setting 'Let users open files stored in third-party storage services in Microsoft 365 on the web'.",
+        "audit_ui": "1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Go to Settings > Org Settings > Services > Microsoft 365 on the web.\n3. Ensure 'Let users open files stored in third-party storage services in Microsoft 365 on the web' is not checked.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://learn.microsoft.com/en-us/microsoft-365/admin/setup/set-up-file-storage-and-sharing?view=o365-worldwide#enable-or-disable-third-party-storage-services"
+        ]
+      },
+      {
+        "id": "1.3.8",
+        "level": "L2",
+        "title": "Ensure that Sways cannot be shared with people outside of your organization",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 2",
+        "description": "Sway is a Microsoft 365 app for creating interactive, web-based presentations using media like text, images, and videos. By default, Sway is enabled for everyone in the organization and presentations can be shared via links, including with external users.",
+        "rationale": "Disable external sharing of Sway documents that may contain sensitive information to avoid accidental or deliberate data leaks.",
+        "impact": "Users will no longer be able to share interactive content created in Sway with individuals outside the organization.",
+        "output": "Manual control",
+        "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Expand Settings > Org settings.\n3. Under Services, select Sway.\n4. Uncheck 'Let people in your organization share their sways with people outside your organization'.\n5. Click Save.",
+        "audit_ui": "1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Expand Settings > Org settings.\n3. Under Services, select Sway.\n4. Confirm that 'Let people in your organization share their sways with people outside your organization' is not checked.",
+        "audit_powershell": "Manual control",
+        "references": [
+          "https://support.microsoft.com/en-us/office/administrator-settings-for-sway-d298e79b-b6ab-44c6-9239-aa312f5784d4",
+          "https://learn.microsoft.com/en-us/office365/servicedescriptions/microsoft-sway-service-description"
+        ]
+      }
+    ]

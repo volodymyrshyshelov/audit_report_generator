@@ -1,0 +1,246 @@
+[
+  {
+    "id": "5.1.1.1",
+    "level": "L1",
+    "title": "Ensure Security Defaults is disabled",
+    "type": "Manual",
+    "profile_applicability": "E3 Level 1",
+    "description": "Security defaults in Microsoft Entra ID make it easier to be secure and help protect the organization. Security defaults contain preconfigured security settings for common attacks. By default, Microsoft enables security defaults. The goal is to ensure that all organizations have a basic level of security enabled. The security default setting is manipulated in the Entra admin center. The use of security defaults, however, will prohibit custom settings which are being set with more advanced settings from this benchmark.",
+    "rationale": "Security defaults provide secure default settings that are managed on behalf of organizations to keep customers safe until they are ready to manage their own identity security settings. For example, doing the following:\n• Requiring all users and admins to register for MFA.\n• Challenging users with MFA - mostly when they show up on a new device or app, but more often for critical roles and tasks.\n• Disabling authentication from legacy authentication clients, which can’t do MFA.",
+    "impact": "The potential impact associated with disabling of Security Defaults is dependent upon the security controls implemented in the environment. It is likely that most organizations disabling Security Defaults plan to implement equivalent controls to replace Security Defaults. It may be necessary to check settings in other Microsoft products, such as Azure, to ensure settings and functionality are as expected when disabling security defaults for MS365.",
+    "output": "Manual control",
+    "remediation": "To remediate using the UI:\n1. Navigate to the Microsoft Entra admin center https://entra.microsoft.com.\n2. Click to expand Identity > Overview.\n3. Click Properties.\n4. Click Manage security defaults.\n5. Set the Security defaults dropdown to Disabled.\n6. Select Save.\n\nTo remediate using PowerShell:\n1. Connect to the Microsoft Graph service using Connect-MgGraph -Scopes 'Policy.ReadWrite.ConditionalAccess'.\n2. Run the following command:\n$params = @{ IsEnabled = $false }\nUpdate-MgPolicyIdentitySecurityDefaultEnforcementPolicy -BodyParameter $params",
+    "audit_ui": "1. Navigate to Microsoft Entra admin center https://entra.microsoft.com.\n2. Click to expand Identity > Overview.\n3. Click Properties.\n4. Review the section Security Defaults near the bottom.\n5. If 'Manage security defaults' appears clickable then proceed to remediation. If 'Manage Conditional Access' appears in blue, Security defaults are already disabled and the audit can be considered a Pass.",
+    "audit_powershell": "1. Connect to the Microsoft Graph service using Connect-MgGraph -Scopes 'Policy.Read.All'.\n2. Run the following command:\nGet-MgPolicyIdentitySecurityDefaultEnforcementPolicy | ft IsEnabled\n3. Ensure the value is false.",
+    "references": [
+      "https://learn.microsoft.com/en-us/entra/fundamentals/security-defaults",
+      "https://techcommunity.microsoft.com/t5/microsoft-entra-blog/introducing-security-defaults/ba-p/1061414"
+    ]
+  },  
+  {
+      "id": "5.1.2.1",
+      "level": "L1",
+      "title": "Ensure 'Per-user MFA' is disabled",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Legacy per-user Multi-Factor Authentication (MFA) can be configured to require individual users to provide multiple authentication factors. This method predates the more comprehensive Conditional Access (CA) system now available.",
+      "rationale": "Per-user MFA is incompatible with security defaults and conditional access policies. Disabling per-user MFA ensures a consistent and centralized method for enforcing MFA using CA, which is preferred in this benchmark.",
+      "impact": "Users will need to transition from per-user MFA to Conditional Access. CA must be configured in advance to avoid gaps in MFA coverage during the switch.",
+      "output": "Manual control",
+      "remediation": "To remediate using the UI:\n1. Navigate to Microsoft Entra admin center https://entra.microsoft.com/.\n2. Expand Identity > Users > All users.\n3. Click Per-user MFA.\n4. Select all accounts and click Disable under Quick Steps.\n\nEnsure your Conditional Access policies enforce MFA for the relevant users.",
+      "audit_ui": "1. Navigate to Microsoft Entra admin center https://entra.microsoft.com/.\n2. Expand Identity > Users > All users.\n3. Click Per-user MFA.\n4. Ensure Multi-factor Auth Status is set to Disabled for all users.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/identity/authentication/howto-mfa-userstates#convert-users-from-per-user-mfa-to-conditional-access",
+        "https://learn.microsoft.com/en-us/microsoft-365/admin/security-and-compliance/set-up-multi-factor-authentication?view=o365-worldwide#use-conditional-access-policies",
+        "https://learn.microsoft.com/en-us/entra/identity/authentication/howto-mfa-userstates#convert-per-user-mfa-enabled-and-enforced-users-to-disabled"
+      ]
+    },
+    {
+      "id": "5.1.2.2",
+      "level": "L2",
+      "title": "Ensure third party integrated applications are not allowed",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 2",
+      "description": "App registration allows users to register custom-developed applications for use within the directory. This setting controls whether users can integrate third-party applications.",
+      "rationale": "Allowing end users to register third-party applications can increase the attack surface, as malicious actors may exploit this feature to maintain persistent access. Disabling it limits exposure.",
+      "impact": "Users will not be able to register third-party applications without admin involvement. Admins may receive more requests to approve application integrations.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "To remediate using the UI:\n1. Navigate to Microsoft Entra admin center https://entra.microsoft.com/.\n2. Go to Identity > Users > User settings.\n3. Set 'Users can register applications' to No and click Save.\n\nTo remediate using PowerShell:\n1. Connect using Connect-MgGraph -Scopes 'Policy.ReadWrite.Authorization'.\n2. Run:\n$param = @{ AllowedToCreateApps = $false }\nUpdate-MgPolicyAuthorizationPolicy -DefaultUserRolePermissions $param",
+      "audit_ui": "1. Navigate to Microsoft Entra admin center https://entra.microsoft.com/.\n2. Go to Identity > Users > User settings.\n3. Verify 'Users can register applications' is set to No.",
+      "audit_powershell": "1. Connect using Connect-MgGraph -Scopes 'Policy.Read.All'.\n2. Run:\n(Get-MgPolicyAuthorizationPolicy).DefaultUserRolePermissions | fl AllowedToCreateApps\n3. Ensure the value is False.",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/identity-platform/how-applications-are-added"
+      ]
+    },
+    {
+      "id": "5.1.2.3",
+      "level": "L1",
+      "title": "Ensure 'Restrict non-admin users from creating tenants' is set to 'Yes'",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "By default, Microsoft Entra ID allows non-admin users to create Microsoft Entra tenants. This could be exploited by malicious users to create unmanaged tenants.",
+      "rationale": "Restricting tenant creation to administrators helps prevent shadow IT and ensures tenant management remains under IT control.",
+      "impact": "Users won’t be able to create new Microsoft Entra tenants, which is typically not needed for most standard roles.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "To remediate using PowerShell:\n1. Connect to Microsoft Graph:\nConnect-MgGraph -Scopes 'Policy.ReadWrite.Authorization'.\n2. Run:\nUpdate-MgPolicyAuthorizationPolicy -DefaultUserRolePermissions @{ AllowTenantCreation = $false }",
+      "audit_ui": "Not applicable",
+      "audit_powershell": "1. Connect using Connect-MgGraph -Scopes 'Policy.Read.All'.\n2. Run:\n(Get-MgPolicyAuthorizationPolicy).DefaultUserRolePermissions | fl AllowTenantCreation\n3. Ensure the value is False.",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/identity/enterprise-users/users-restrict-tenant-creation"
+      ]
+    },
+    {
+      "id": "5.1.2.4",
+      "level": "L1",
+      "title": "Ensure access to the Entra admin center is restricted",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Controlling access to the Entra admin center ensures that only designated personnel can make critical changes to identity, access, and tenant-level policies.",
+      "rationale": "Restricting access to sensitive portals mitigates risks of unauthorized configuration changes that could lead to privilege escalation or service misconfiguration.",
+      "impact": "May require creation and assignment of custom roles or policies to allow only necessary administrative access.",
+      "output": "Manual control",
+      "remediation": "Restrict access using Conditional Access or network restrictions:\n1. Create a Conditional Access policy.\n2. Target Entra admin portal (entra.microsoft.com).\n3. Assign to only required roles or administrative groups.\n4. Use location or device filters if needed.",
+      "audit_ui": "1. Review Conditional Access policies in Microsoft Entra.\n2. Verify that Entra admin access is scoped to necessary roles or trusted locations.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-policies"
+      ]
+    },
+    {
+      "id": "5.1.2.5",
+      "level": "L2",
+      "title": "Ensure the option to remain signed in is hidden",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 2",
+      "description": "The 'Keep me signed in' (KMSI) prompt increases session persistence across user logins. Hiding this prompt reduces the risk of sessions persisting across shared or unmanaged devices.",
+      "rationale": "Disabling or hiding persistent login options improves security in shared environments by reducing exposure from unattended sessions.",
+      "impact": "Users may be required to sign in more frequently. Could affect user experience but improves session control.",
+      "output": "Manual control",
+      "remediation": "To remediate using PowerShell:\n1. Connect using Connect-MgGraph -Scopes 'Policy.ReadWrite.Organization'.\n2. Run:\nSet-MgOrganization -OrganizationId <tenantId> -HideKeepMeSignedIn $true",
+      "audit_ui": "There is no direct UI setting. Use PowerShell to confirm the status.",
+      "audit_powershell": "1. Connect using Connect-MgGraph -Scopes 'Policy.Read.All'.\n2. Run:\nGet-MgOrganization | fl HideKeepMeSignedIn\n3. Ensure the value is True.",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/identity/enterprise-users/users-hide-kmsi-prompt"
+      ]
+    },
+    {
+      "id": "5.1.2.6",
+      "level": "L2",
+      "title": "Ensure 'LinkedIn account connections' is disabled",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 2",
+      "description": "LinkedIn integration in Microsoft 365 allows enrichment of profile data with LinkedIn info. Disabling this feature helps limit exposure of corporate identity information.",
+      "rationale": "Disabling LinkedIn integration avoids unintentional exposure of user metadata to third-party services and reduces external dependencies.",
+      "impact": "LinkedIn profile data and collaboration features will no longer be accessible through Microsoft 365.",
+      "output": "Manual control",
+      "remediation": "1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Go to Org settings > LinkedIn.\n3. Uncheck the box to disable LinkedIn account connections.\n4. Click Save.",
+      "audit_ui": "1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Go to Org settings > LinkedIn.\n3. Ensure LinkedIn account connections is disabled.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-365/admin/microsoft-365-admin-center-settings",
+        "https://learn.microsoft.com/en-us/linkedin/sales-navigator/integrations/microsoft-admin-center"
+      ]
+    },
+    {
+      "id": "5.1.3.1",
+      "level": "L1",
+      "title": "Ensure a dynamic group for guest users is created",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "Creating a dynamic group for guest users allows automated policy targeting and monitoring. Membership is based on userType = Guest, ensuring all external users are included automatically.",
+      "rationale": "Dynamic groups reduce administrative overhead and ensure consistent application of security and compliance policies to all guest users.",
+      "impact": "None. This improves automation and targeting for access reviews, Conditional Access, and monitoring.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "To remediate using the UI:\n1. Navigate to Microsoft Entra admin center https://entra.microsoft.com.\n2. Go to Identity > Groups > New group.\n3. Select Security as Group type.\n4. Select Membership type: Dynamic User.\n5. Under Dynamic user members, create a rule: user.userType -eq \"Guest\".\n6. Name the group appropriately and create it.",
+      "audit_ui": "1. Navigate to Microsoft Entra admin center.\n2. Go to Groups > All groups.\n3. Locate the dynamic group and ensure the membership rule targets userType = Guest.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/identity/users/groups-dynamic-membership"
+      ]
+    },
+    {
+      "id": "5.1.5.1",
+      "level": "L2",
+      "title": "Ensure user consent to apps accessing company data on their behalf is not allowed",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 2",
+      "description": "By default, users can consent to applications accessing organizational data. This can be abused by malicious applications to gain access to sensitive content.",
+      "rationale": "Restricting user consent ensures that only vetted applications can access corporate data, reducing the risk of data leakage or compromise.",
+      "impact": "Administrators must approve application access requests, increasing oversight but also administrative workload.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "To remediate using the UI:\n1. Go to Microsoft Entra admin center https://entra.microsoft.com.\n2. Navigate to Identity > Applications > User settings.\n3. Set 'Users can consent to apps accessing company data on their behalf' to No.",
+      "audit_ui": "1. Navigate to Entra admin center > Identity > Applications > User settings.\n2. Confirm that the consent setting is set to No.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/identity/applications/user-consent"
+      ]
+    },
+    {
+      "id": "5.1.5.2",
+      "level": "L1",
+      "title": "Ensure the admin consent workflow is enabled",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 1",
+      "description": "Enabling the admin consent workflow provides a formal process for users to request access to applications. Admins are notified and can review and approve or deny access.",
+      "rationale": "The workflow helps strike a balance between user productivity and security by involving IT in the approval process.",
+      "impact": "Increased oversight of application access. Admins must monitor and respond to access requests.",
+      "output": "Manual control",
+      "remediation": "To enable using the UI:\n1. Navigate to Microsoft Entra admin center https://entra.microsoft.com.\n2. Go to Identity > Applications > Admin consent settings.\n3. Set 'Admin consent requests' to Yes.\n4. Choose reviewers and configure notification settings.\n5. Save your changes.",
+      "audit_ui": "1. Navigate to Entra admin center > Admin consent settings.\n2. Confirm that admin consent is enabled and reviewers are configured.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/identity/applications/manage-user-consent-requests"
+      ]
+    },
+    {
+      "id": "5.1.6.1",
+      "level": "L2",
+      "title": "Ensure that collaboration invitations are sent to allowed domains only",
+      "type": "Manual",
+      "profile_applicability": "E3 Level 2",
+      "description": "Organizations can limit collaboration to specific partner domains. Allowing all domains may inadvertently enable sharing with unknown or untrusted parties.",
+      "rationale": "Limiting invited domains reduces exposure to phishing and ensures only approved business partners have access.",
+      "impact": "Partners outside the allow list will be unable to accept invitations. Coordination is needed for access.",
+      "output": "Manual control",
+      "remediation": "To restrict domains using the UI:\n1. Navigate to Entra admin center https://entra.microsoft.com.\n2. Go to Identity > External identities > External collaboration settings.\n3. Set 'Collaboration restrictions' to 'Allow invitations only to the specified domains'.\n4. Enter the list of allowed domains.\n5. Save changes.",
+      "audit_ui": "1. Navigate to External collaboration settings.\n2. Verify that only specific domains are allowed and the restriction is enforced.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/external-id/external-collaboration-settings"
+      ]
+    },
+    {
+      "id": "5.1.6.2",
+      "level": "L1",
+      "title": "Ensure that guest user access is restricted",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "This setting controls what permissions guest users receive by default. By restricting default access, organizations can ensure that guests only get necessary permissions through explicit assignment.",
+      "rationale": "Restricting guest access prevents unintended data exposure and aligns with least privilege principles.",
+      "impact": "Guests will require explicit permission assignment for each access need.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "To restrict access using PowerShell:\n1. Connect-MgGraph -Scopes 'Policy.ReadWrite.Authorization'.\n2. Run:\nSet-MgPolicyAuthorizationPolicy -DefaultUserRolePermissions @{ GuestUserRoleId = 'RestrictedGuest' }",
+      "audit_ui": "No direct UI setting. Confirm via PowerShell.",
+      "audit_powershell": "Connect-MgGraph -Scopes 'Policy.Read.All'\nGet-MgPolicyAuthorizationPolicy | fl DefaultUserRolePermissions\nEnsure GuestUserRoleId is set to 'RestrictedGuest'.",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/external-id/guest-user-permissions"
+      ]
+    },
+    {
+      "id": "5.1.6.3",
+      "level": "L2",
+      "title": "Ensure guest user invitations are limited to the Guest Inviter role",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 2",
+      "description": "Restricting guest invitations to users with the Guest Inviter role ensures control over who can invite external users.",
+      "rationale": "Limiting invitation capabilities minimizes the risk of unauthorized or inappropriate external sharing.",
+      "impact": "Only approved users or groups can invite guests. May require internal process changes.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "To configure in the UI:\n1. Navigate to Entra admin center > Identity > External identities > External collaboration settings.\n2. Set 'Guest invite settings' to 'Only users assigned to the Guest Inviter role'.",
+      "audit_ui": "1. Navigate to External collaboration settings.\n2. Confirm that only Guest Inviters can send invitations.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/external-id/guest-user-permissions"
+      ]
+    },
+    {
+      "id": "5.1.8.1",
+      "level": "L1",
+      "title": "Ensure that password hash sync is enabled for hybrid deployments",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "Password hash synchronization is a feature used to provide a consistent user experience across on-premises and cloud environments.",
+      "rationale": "Enabling password hash sync allows users to authenticate to Microsoft 365 with the same password used on-premises. This supports seamless sign-on and improved user productivity.",
+      "impact": "Organizations benefit from simplified sign-on without needing more complex federation setups.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "To enable using Azure AD Connect:\n1. Launch the Azure AD Connect tool.\n2. Select 'Customize synchronization options'.\n3. Ensure 'Password hash synchronization' is enabled.",
+      "audit_ui": "Review the Azure AD Connect sync tool status dashboard.",
+      "audit_powershell": "Manual control",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/identity/hybrid/connect/how-to-connect-password-hash-synchronization"
+      ]
+    }
+  ]
+  
+  

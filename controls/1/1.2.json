@@ -1,0 +1,40 @@
+[
+    {
+      "id": "1.2.1",
+      "level": "L2",
+      "title": "Ensure that only organizationally managed/approved public groups exist",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 2",
+      "description": "Microsoft 365 Groups is the foundational membership service that drives teamwork across Microsoft 365. With Microsoft 365 Groups, you can give a group of people access to a collection of shared resources. When a group is created via the admin panel, its default privacy value is 'Public'.",
+      "rationale": "Ensure that only organizationally managed and approved public groups exist. Public groups allow access to data via Azure portal, access panel, or SharePoint URLs—even without approval. These URLs can be guessed or discovered, potentially exposing sensitive information.",
+      "impact": "Group owners may receive an increased number of access requests, especially for groups originally meant to be public.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Expand Teams & groups and select Active teams & groups.\n3. Select the public group from the list.\n4. In the group settings panel, select Settings.\n5. Under Privacy, change the value to Private.",
+      "audit_ui": "1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Expand Teams & groups and select Active teams & groups.\n3. Review the privacy column and ensure no groups are listed as Public.",
+      "audit_powershell": "Connect-MgGraph -Scopes \"Group.Read.All\"\n\nGet-MgGroup | Where-Object { $_.Visibility -eq 'Public' } | Select-Object DisplayName, Visibility\n\nEnsure Visibility is Private for each group.",
+      "references": [
+        "https://learn.microsoft.com/en-us/entra/identity/users/groups-self-service-management",
+        "https://learn.microsoft.com/en-us/microsoft-365/admin/create-groups/compare-groups?view=o365-worldwide"
+      ]
+    },
+    {
+      "id": "1.2.2",
+      "level": "L1",
+      "title": "Ensure sign-in to shared mailboxes is blocked",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "Shared mailboxes are intended for multiple people to access and send email from a common address (e.g., support or reception). These are created with a system-generated password and should not be accessed directly.",
+      "rationale": "Direct sign-in to shared mailboxes bypasses accountability. If an admin or attacker resets the password, they can log in and send emails without unique identification. Sign-in should be blocked to enforce delegated access only.",
+      "impact": "Normal delegated access remains. Direct sign-in will be blocked for shared mailboxes.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Expand Teams & groups and select Shared mailboxes.\n3. Note all shared mailboxes.\n4. Expand Users > Active users.\n5. Select the corresponding account, choose Block sign-in, and confirm.\n6. Repeat for all shared mailboxes.",
+      "audit_ui": "1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Expand Teams & groups > Shared mailboxes.\n3. Review all shared mailboxes.\n4. Expand Users > Active users.\n5. For each mailbox account, open properties and ensure Sign-in blocked is shown.",
+      "audit_powershell": "Connect-ExchangeOnline\nConnect-MgGraph -Scopes \"Policy.Read.All\"\n\n$MBX = Get-EXOMailbox -RecipientTypeDetails SharedMailbox\n$MBX | ForEach-Object { Get-MgUser -UserId $_.ExternalDirectoryObjectId -Property DisplayName, UserPrincipalName, AccountEnabled } | Format-Table DisplayName, UserPrincipalName, AccountEnabled\n\nEnsure AccountEnabled is set to False for all shared mailboxes.",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-365/admin/email/about-shared-mailboxes?view=o365-worldwide",
+        "https://learn.microsoft.com/en-us/microsoft-365/admin/email/create-a-shared-mailbox?view=o365-worldwide#block-sign-in-for-the-shared-mailbox-account",
+        "https://learn.microsoft.com/en-us/microsoft-365/enterprise/block-user-accounts-with-microsoft-365-powershell?view=o365-worldwide#block-individual-user-accounts"
+      ]
+    }
+  ]
+  

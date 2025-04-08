@@ -1,0 +1,156 @@
+[
+    {
+        "id": "8.5.1",
+        "level": "L2",
+        "title": "Ensure anonymous users can't join a meeting",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 2",
+        "description": "Controls whether anonymous users can join Teams meetings. Recommended to be set to False to enhance meeting security.",
+        "rationale": "Blocking anonymous users prevents unauthorized participants from joining meetings and accessing potentially sensitive information.",
+        "impact": "External users must be invited and authenticated to join meetings.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Run in PowerShell:\nSet-CsTeamsMeetingPolicy -AllowAnonymousUsersToJoinMeeting $false",
+        "audit_ui": "Microsoft Teams admin center > Meetings > Meeting policies\nCheck that 'Anonymous users can join a meeting' is set to Off.",
+        "audit_powershell": "Get-CsTeamsMeetingPolicy | Format-Table Identity, AllowAnonymousUsersToJoinMeeting\nEnsure value is False.",
+        "references": [
+          "https://learn.microsoft.com/en-us/powershell/module/teams/set-csteamsmeetingpolicy"
+        ]
+      },
+      {
+        "id": "8.5.2",
+        "level": "L1",
+        "title": "Ensure anonymous users and dial-in callers can't start a meeting",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "Restricts who can start a meeting. Only authenticated and invited users should be allowed to initiate a Teams meeting.",
+        "rationale": "Preventing unauthorized users from starting meetings ensures control over meeting content and participation.",
+        "impact": "Anonymous users and PSTN callers must wait for an authenticated user to start the meeting.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Run in PowerShell:\nSet-CsTeamsMeetingPolicy -AllowPSTNUsersToBypassLobby $false -AllowAnonymousUsersToStartMeeting $false",
+        "audit_ui": "Teams admin center > Meetings > Meeting policies\nEnsure that anonymous and PSTN users are not allowed to start meetings.",
+        "audit_powershell": "Get-CsTeamsMeetingPolicy | Format-Table Identity, AllowPSTNUsersToBypassLobby, AllowAnonymousUsersToStartMeeting\nVerify both are set to False.",
+        "references": [
+          "https://learn.microsoft.com/en-us/powershell/module/teams/set-csteamsmeetingpolicy"
+        ]
+      },
+      {
+        "id": "8.5.3",
+        "level": "L1",
+        "title": "Ensure only people in my org can bypass the lobby",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "Restricts lobby bypass to internal users only. All external participants must wait in the lobby until admitted.",
+        "rationale": "Ensures that only trusted organizational users can join meetings directly, enhancing meeting control.",
+        "impact": "Guests and external users will be held in the lobby until an organizer admits them.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Set-CsTeamsMeetingPolicy -WhoCanBypassLobby 'Organization'",
+        "audit_ui": "Teams admin center > Meetings > Meeting policies\nConfirm the lobby bypass setting is configured to 'People in my organization'.",
+        "audit_powershell": "Get-CsTeamsMeetingPolicy | Format-Table Identity, WhoCanBypassLobby\nEnsure value is 'Organization'.",
+        "references": [
+          "https://learn.microsoft.com/en-us/microsoftteams/meeting-policies-in-teams"
+        ]
+      },
+      {
+        "id": "8.5.4",
+        "level": "L1",
+        "title": "Ensure users dialing in can't bypass the lobby",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "This setting ensures that PSTN users must wait in the lobby until admitted to a Teams meeting.",
+        "rationale": "Requiring lobby approval for dial-in users prevents unauthorized or disruptive access to meetings.",
+        "impact": "PSTN users will not join meetings until allowed in by an organizer.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Run:\nSet-CsTeamsMeetingPolicy -AllowPSTNUsersToBypassLobby $false",
+        "audit_ui": "Teams admin center > Meetings > Meeting policies\nCheck that 'Dial-in users can bypass lobby' is disabled.",
+        "audit_powershell": "Get-CsTeamsMeetingPolicy | Format-Table Identity, AllowPSTNUsersToBypassLobby\nEnsure it is False.",
+        "references": [
+          "https://learn.microsoft.com/en-us/powershell/module/teams/set-csteamsmeetingpolicy"
+        ]
+      },
+      {
+        "id": "8.5.5",
+        "level": "L2",
+        "title": "Ensure meeting chat does not allow anonymous users",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 2",
+        "description": "Disables the ability for anonymous participants to use chat during Teams meetings.",
+        "rationale": "Preventing anonymous users from accessing chat reduces the risk of sharing sensitive information or receiving malicious content.",
+        "impact": "Anonymous attendees will not be able to send or view chat messages during meetings.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Set-CsTeamsMeetingPolicy -AllowAnonymousUsersToParticipateInMeetingChat $false",
+        "audit_ui": "Teams admin center > Meetings > Meeting policies\nVerify that chat for anonymous users is disabled.",
+        "audit_powershell": "Get-CsTeamsMeetingPolicy | Format-Table Identity, AllowAnonymousUsersToParticipateInMeetingChat\nEnsure value is False.",
+        "references": [
+          "https://learn.microsoft.com/en-us/microsoftteams/meeting-policies-in-teams"
+        ]
+      },
+      {
+        "id": "8.5.6",
+        "level": "L2",
+        "title": "Ensure only organizers and co-organizers can present",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 2",
+        "description": "Restricts screen sharing and presentation privileges in meetings to only organizers and co-organizers.",
+        "rationale": "Prevents disruptions and ensures only trusted users control presentation flow during meetings.",
+        "impact": "Other participants will be unable to present unless promoted by the organizer.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Set-CsTeamsMeetingPolicy -WhoCanPresent 'OrganizersAndCoOrganizers'",
+        "audit_ui": "Teams admin center > Meetings > Meeting policies\nCheck that the setting for who can present is limited to organizers and co-organizers.",
+        "audit_powershell": "Get-CsTeamsMeetingPolicy | Format-Table Identity, WhoCanPresent\nEnsure value is 'OrganizersAndCoOrganizers'.",
+        "references": [
+          "https://learn.microsoft.com/en-us/powershell/module/teams/set-csteamsmeetingpolicy"
+        ]
+      },
+      {
+        "id": "8.5.7",
+        "level": "L1",
+        "title": "Ensure external participants can't give or request control",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "Disables the ability for external users to give or request control during screen sharing sessions.",
+        "rationale": "Reduces the risk of unauthorized access or manipulation of content shared in meetings.",
+        "impact": "External users will not be able to control shared screens.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Set-CsTeamsMeetingPolicy -AllowExternalParticipantsToGiveRequestControl $false",
+        "audit_ui": "Teams admin center > Meetings > Meeting policies\nEnsure that the control sharing option is disabled for external users.",
+        "audit_powershell": "Get-CsTeamsMeetingPolicy | Format-Table Identity, AllowExternalParticipantsToGiveRequestControl\nEnsure value is False.",
+        "references": [
+          "https://learn.microsoft.com/en-us/powershell/module/teams/set-csteamsmeetingpolicy"
+        ]
+      },
+      {
+        "id": "8.5.8",
+        "level": "L2",
+        "title": "Ensure external meeting chat is off",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 2",
+        "description": "Prevents external users from participating in chat during meetings to protect internal discussions.",
+        "rationale": "Mitigates risk of data exposure or leaks via chat to users outside the organization.",
+        "impact": "External participants will not be able to use meeting chat.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Set-CsTeamsMeetingPolicy -AllowExternalUserToParticipateInMeetingChat $false",
+        "audit_ui": "Teams admin center > Meetings > Meeting policies\nEnsure chat is disabled for external participants.",
+        "audit_powershell": "Get-CsTeamsMeetingPolicy | Format-Table Identity, AllowExternalUserToParticipateInMeetingChat\nEnsure value is False.",
+        "references": [
+          "https://learn.microsoft.com/en-us/microsoftteams/meeting-policies-in-teams"
+        ]
+      },
+      {
+        "id": "8.5.9",
+        "level": "L2",
+        "title": "Ensure meeting recording is off by default",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 2",
+        "description": "Controls whether meeting recording starts automatically. Disabling this by default reduces the chance of recording sensitive data unintentionally.",
+        "rationale": "Preventing automatic recording protects privacy and avoids retaining data that may be sensitive or unnecessary.",
+        "impact": "Users must manually start recording if required.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "Set-CsTeamsMeetingPolicy -AllowCloudRecording $false",
+        "audit_ui": "Teams admin center > Meetings > Meeting policies\nEnsure 'Cloud recording' is set to Off by default.",
+        "audit_powershell": "Get-CsTeamsMeetingPolicy | Format-Table Identity, AllowCloudRecording\nEnsure value is False.",
+        "references": [
+          "https://learn.microsoft.com/en-us/powershell/module/teams/set-csteamsmeetingpolicy"
+        ]
+      }
+    ]
+    

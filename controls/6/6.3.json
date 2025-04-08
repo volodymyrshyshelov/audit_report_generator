@@ -1,0 +1,19 @@
+[
+  {
+    "id": "6.3.1",
+    "level": "L2",
+    "title": "Ensure users installing Outlook add-ins is not allowed",
+    "type": "Automated",
+    "profile_applicability": "E3 Level 2",
+    "description": "Users can install Outlook add-ins that may pose security risks or exfiltrate data. This control ensures only approved add-ins are used.",
+    "rationale": "Blocking user installation of add-ins prevents unvetted applications from accessing mailbox contents or executing code.",
+    "impact": "Users may need to request admin approval for new add-ins. Reduces flexibility but improves security.",
+    "output": "<output from PowerShell script here>",
+    "remediation": "Connect to Exchange Online and run:\nSet-OwaMailboxPolicy -Identity OwaMailboxPolicy-Default -DefaultThemeEnabled $false -AddInsEnabled $false",
+    "audit_ui": "Exchange admin center > Organization > Add-ins\nReview whether user-installed add-ins are disabled.",
+    "audit_powershell": "Connect-ExchangeOnline\nGet-OwaMailboxPolicy | Format-List Identity, AddInsEnabled\nEnsure AddInsEnabled is False.",
+    "references": [
+      "https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/outlook-on-the-web/outlook-web-app-policies"
+    ]
+  }
+]

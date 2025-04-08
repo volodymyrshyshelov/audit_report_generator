@@ -1,0 +1,254 @@
+[
+    {
+      "id": "2.1.1",
+      "level": "L2",
+      "title": "Ensure Safe Links for Office Applications is Enabled",
+      "type": "Automated",
+      "profile_applicability": "E5 Level 2",
+      "description": "Safe Links protects users by scanning and rewriting URLs in Office documents and email applications, providing time-of-click verification against known malicious links.",
+      "rationale": "Extending Safe Links to Office applications ensures URLs in Office files are evaluated for safety when accessed, offering an important layer of phishing and malware protection.",
+      "impact": "Users may experience a slight delay when clicking links, and blocked unsafe links will show a warning message.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Under Email & collaboration, select Policies & rules.\n3. Select Threat policies then Safe Links.\n4. Click on Edit Protection settings and ensure Safe Links for Office applications is enabled.",
+      "audit_ui": "1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Under Email & collaboration select Policies & rules.\n3. Select Threat policies then Safe Links.\n4. Verify Safe Links is enabled for Office apps and related options are correctly configured.",
+      "audit_powershell": "Connect-ExchangeOnline\nGet-SafeLinksPolicy | Format-Table Name,EnableSafeLinksForOfficeApps\nEnsure EnableSafeLinksForOfficeApps is set to True.",
+      "references": [
+        "https://learn.microsoft.com/en-us/defender-office-365/safe-links-policies-configure?view=o365-worldwide",
+        "https://learn.microsoft.com/en-us/powershell/module/exchange/set-safelinkspolicy?view=exchange-ps",
+        "https://learn.microsoft.com/en-us/defender-office-365/preset-security-policies?view=o365-worldwide"
+      ]
+    },
+    {
+      "id": "2.1.2",
+      "level": "L1",
+      "title": "Ensure the Common Attachment Types Filter is enabled",
+      "type": "Automated",
+      "profile_applicability": "E3 Level 1",
+      "description": "The Common Attachment Types Filter lets a user block known and custom malicious file types from being attached to emails.",
+      "rationale": "Blocking known malicious file types can help prevent malware-infested files from infecting a host.",
+      "impact": "Blocking common malicious file types should not cause an impact in modern computing environments.",
+      "output": "<output from PowerShell script here>",
+      "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Under Email & collaboration, select Policies & rules > Threat policies.\n3. Select Anti-malware and open the Default policy.\n4. Click Edit protection settings and check the option to enable the common attachments filter.",
+      "audit_ui": "1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Under Email & collaboration, select Policies & rules > Threat policies.\n3. Select Anti-malware and open the Default policy.\n4. Ensure 'Enable the common attachments filter' is set to On.",
+      "audit_powershell": "Connect-ExchangeOnline\nGet-MalwareFilterPolicy -Identity Default | Select EnableFileFilter\nEnsure EnableFileFilter is set to True.",
+      "references": [
+        "https://learn.microsoft.com/en-us/powershell/module/exchange/get-malwarefilterpolicy?view=exchange-ps",
+        "https://learn.microsoft.com/en-us/defender-office-365/anti-malware-policies-configure?view=o365-worldwide"
+      ]
+    },
+    {
+        "id": "2.1.3",
+        "level": "L1",
+        "title": "Ensure notifications for internal users sending malware is Enabled",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "Exchange Online Protection (EOP) is the cloud-based filtering service that protects organizations against spam, malware, and other email threats. EOP is included in all Microsoft 365 organizations with Exchange Online mailboxes. EOP uses flexible anti-malware policies for malware protection settings. These policies can be set to notify Admins of malicious activity.",
+        "rationale": "This setting alerts administrators that an internal user sent a message that contained malware. This may indicate an account or machine compromise that would need to be investigated.",
+        "impact": "Notification of account with potential issues should not have an impact on the user.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules.\n3. Under Threat policies select Anti-malware.\n4. Click the Default (Default) policy.\n5. Click Edit protection settings.\n6. Change 'Notify an admin about undelivered messages from internal senders' to On and provide an administrator email address.\n7. Click Save.\n\nTo remediate using PowerShell:\nConnect-ExchangeOnline\nSet-MalwareFilterPolicy -Identity 'Default' -EnableInternalSenderAdminNotifications $True -InternalSenderAdminAddress 'admin@domain.com'",
+        "audit_ui": "1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules.\n3. Under Threat policies select Anti-malware.\n4. Click on the Default (Default) policy.\n5. Ensure 'Notify an admin about undelivered messages from internal senders' is set to On and there is at least one administrator email address configured.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-MalwareFilterPolicy | fl Identity, EnableInternalSenderAdminNotifications, InternalSenderAdminAddress\nEnsure EnableInternalSenderAdminNotifications is True and InternalSenderAdminAddress is populated.",
+        "references": [
+          "https://learn.microsoft.com/en-us/defender-office-365/anti-malware-protection-about",
+          "https://learn.microsoft.com/en-us/defender-office-365/anti-malware-policies-configure"
+        ]
+      },
+      {
+        "id": "2.1.4",
+        "level": "L2",
+        "title": "Ensure Safe Attachments policy is enabled",
+        "type": "Automated",
+        "profile_applicability": "E5 Level 2",
+        "description": "The Safe Attachments policy helps protect users from malware in email attachments by scanning attachments for viruses, malware, and other malicious content. Attachments are scanned in a secure, cloud-based environment before they are delivered to the user's inbox.",
+        "rationale": "Enabling Safe Attachments policy helps protect against malware threats in email attachments by analyzing suspicious attachments in a secure, cloud-based environment before delivery.",
+        "impact": "Delivery of email with attachments may be delayed while scanning is occurring. Quarantined attachments may require administrative review.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules.\n3. Under Threat policies select Safe Attachments.\n4. Create or modify a policy.\n5. Ensure the policy applies to all valid domains.\n6. Set the detection response to 'Block'.\n7. Set the Quarantine Policy to 'AdminOnlyAccessPolicy'.\n8. Leave 'Enable redirect' unchecked.\n9. Submit the changes.\n\nTo remediate using PowerShell:\nConnect-ExchangeOnline\nSet-SafeAttachmentPolicy -Identity - <PolicyName> -Enable $true -Action Block -QuarantineTag AdminOnlyAccessPolicy",
+        "audit_ui": "1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules.\n3. Under Threat policies select Safe Attachments.\n4. Review the highest priority policy.\n5. Ensure it is enabled, detection response is set to Block, and Quarantine Policy is AdminOnlyAccessPolicy.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-SafeAttachmentPolicy | Where-Object { $_.Enable -eq $true }",
+        "references": [
+          "https://learn.microsoft.com/en-us/defender-office-365/safe-attachments-about",
+          "https://learn.microsoft.com/en-us/defender-office-365/safe-attachments-policies-configure"
+        ]
+      },
+      {
+        "id": "2.1.5",
+        "level": "L2",
+        "title": "Ensure Safe Attachments for SharePoint, OneDrive, and Microsoft Teams is Enabled",
+        "type": "Automated",
+        "profile_applicability": "E5 Level 2",
+        "description": "Safe Attachments for SharePoint, OneDrive, and Microsoft Teams scans these services for malicious files. If detected, files are blocked so they can't be opened, moved, copied, or shared until a security review is completed.",
+        "rationale": "This feature protects organizations from inadvertently sharing malicious content through commonly used collaboration platforms.",
+        "impact": "Minimal impact, comparable to traditional antivirus scanning.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules.\n3. Under Threat policies select Safe Attachments.\n4. Click on Global settings.\n5. Enable Defender for Office 365 for SharePoint, OneDrive, and Microsoft Teams.\n6. Enable Safe Documents.\n7. Disable the option to allow people to click through Protected View.",
+        "audit_ui": "1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules.\n3. Under Threat policies select Safe Attachments > Global settings.\n4. Verify that the following options are enabled: Defender for Office 365 for SPOTeamsODB, Safe Documents; and that 'Allow people to click through Protected View' is disabled.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-AtpPolicyForO365 | fl Name,EnableATPForSPOTeamsODB,EnableSafeDocs,AllowSafeDocsOpen\nEnsure EnableATPForSPOTeamsODB and EnableSafeDocs are True, and AllowSafeDocsOpen is False.",
+        "references": [
+          "https://learn.microsoft.com/en-us/defender-office-365/safe-attachments-for-spo-odfb-teams-about"
+        ]
+      },
+      {
+        "id": "2.1.6",
+        "level": "L1",
+        "title": "Ensure Exchange Online Spam Policies are set to notify administrators",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "Exchange Online Protection (EOP) can notify administrators when outbound spam is detected, helping to identify potentially compromised accounts.",
+        "rationale": "Blocked accounts can indicate a compromise. Notifications allow security teams to act quickly to mitigate risk.",
+        "impact": "Minimal impact to users. Only notifications to administrators are configured.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules > Threat policies.\n3. Select Anti-spam > Anti-spam outbound policy (default).\n4. Click Edit protection settings.\n5. Enable the options for sending a copy of suspicious outbound messages and notify if a sender is blocked.\n6. Enter administrator email addresses.\n7. Click Save.\n\nTo remediate using PowerShell:\nConnect-ExchangeOnline\n$BccEmailAddress = @('<INSERT-EMAIL>')\n$NotifyEmailAddress = @('<INSERT-EMAIL>')\nSet-HostedOutboundSpamFilterPolicy -Identity Default -BccSuspiciousOutboundMail $true -NotifyOutboundSpam $true -NotifyOutboundSpamRecipients $NotifyEmailAddress -BccSuspiciousOutboundAdditionalRecipients $BccEmailAddress",
+        "audit_ui": "1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules > Threat policies.\n3. Select Anti-spam > Anti-spam outbound policy (default).\n4. Confirm both notification settings are enabled and appropriate addresses are listed.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-HostedOutboundSpamFilterPolicy | Select-Object BccSuspiciousOutboundMail, NotifyOutboundSpam, NotifyOutboundSpamRecipients\nEnsure both values are True and recipient addresses are populated.",
+        "references": [
+          "https://learn.microsoft.com/en-us/defender-office-365/outbound-spam-protection-about"
+        ]
+      },
+      {
+        "id": "2.1.7",
+        "level": "L2",
+        "title": "Ensure that an anti-phishing policy has been created",
+        "type": "Automated",
+        "profile_applicability": "E5 Level 2",
+        "description": "Anti-phishing policies offer protection against phishing attacks, including impersonation and spoofing. Office 365 includes default protections, but creating and configuring a custom policy ensures enhanced protection with specific criteria.",
+        "rationale": "A properly configured anti-phishing policy protects users from advanced threats by blocking impersonation attempts and providing safety tips for suspicious messages.",
+        "impact": "Custom anti-phishing rules can impact systems like helpdesks that may be flagged for impersonation. Ensure such systems are excluded.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "To remediate using PowerShell:\n1. Connect-ExchangeOnline\n2. Create policy:\n$params = @{\n    Name = \"CIS AntiPhish Policy\"\n    PhishThresholdLevel = 3\n    EnableTargetedUserProtection = $true\n    EnableOrganizationDomainsProtection = $true\n    EnableMailboxIntelligence = $true\n    EnableMailboxIntelligenceProtection = $true\n    EnableSpoofIntelligence = $true\n    TargetedUserProtectionAction = 'Quarantine'\n    TargetedDomainProtectionAction = 'Quarantine'\n    MailboxIntelligenceProtectionAction = 'Quarantine'\n    TargetedUserQuarantineTag = 'DefaultFullAccessWithNotificationPolicy'\n    MailboxIntelligenceQuarantineTag = 'DefaultFullAccessWithNotificationPolicy'\n    TargetedDomainQuarantineTag = 'DefaultFullAccessWithNotificationPolicy'\n    EnableFirstContactSafetyTips = $true\n    EnableSimilarUsersSafetyTips = $true\n    EnableSimilarDomainsSafetyTips = $true\n    EnableUnusualCharactersSafetyTips = $true\n    HonorDmarcPolicy = $true\n}\nNew-AntiPhishPolicy @params\nNew-AntiPhishRule -Name $params.Name -AntiPhishPolicy $params.Name -RecipientDomainIs (Get-AcceptedDomain).Name -Priority 0",
+        "audit_ui": "1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules > Threat policies.\n3. Select Anti-phishing.\n4. Ensure there is a policy listed as On.\n5. Verify it targets a majority of the organization.\n6. Check that phishing threshold is at least 3 and impersonation protection is On.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-AntiPhishPolicy\nEnsure the policy exists and has appropriate settings as defined above.",
+        "references": [
+          "https://learn.microsoft.com/en-us/defender-office-365/anti-phishing-protection-about",
+          "https://learn.microsoft.com/en-us/defender-office-365/anti-phishing-policies-eop-configure"
+        ]
+      },
+      {
+        "id": "2.1.8",
+        "level": "L1",
+        "title": "Ensure that SPF records are published for all Exchange Domains",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 1",
+        "description": "Sender Policy Framework (SPF) helps prevent spoofing by defining allowed sending hosts for a domain. SPF records should be published for every accepted domain in Exchange Online.",
+        "rationale": "Publishing SPF records enables recipient mail systems to validate message origin and identify spoofed messages. This is essential to protect against phishing.",
+        "impact": "Incorrect SPF configuration may cause legitimate mail to be flagged as spam. Test changes before enforcement.",
+        "output": "Manual control",
+        "remediation": "To remediate using a DNS Provider:\n1. Add a TXT record for each accepted domain:\nv=spf1 include:spf.protection.outlook.com -all\n2. If there are third-party senders, adjust accordingly using guidance:\nhttps://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-spf-configure?view=o365-worldwide",
+        "audit_ui": "Not applicable",
+        "audit_powershell": "Resolve-DnsName domain.com -Type TXT | Where-Object { $_.Strings -like 'v=spf1*' }\nEnsure output includes v=spf1 include:spf.protection.outlook.com",
+        "references": [
+          "https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-spf-configure?view=o365-worldwide"
+        ]
+      },
+      {
+        "id": "2.1.9",
+        "level": "L1",
+        "title": "Ensure that DKIM is enabled for all Exchange Online Domains",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "DomainKeys Identified Mail (DKIM) adds a cryptographic signature to emails sent from your domain. It enables recipient systems to verify that messages were not altered in transit and were sent by authorized systems.",
+        "rationale": "Enabling DKIM strengthens email authentication, helps prevent spoofing, and improves deliverability of legitimate messages.",
+        "impact": "Enabling DKIM requires publishing DNS records. If misconfigured, it could delay mail delivery.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules > Threat policies.\n3. Select Email authentication settings > DKIM.\n4. Click each domain and enable 'Sign messages for this domain with DKIM signature'.\n\nTo remediate using PowerShell:\nConnect-ExchangeOnline\nSet-DkimSigningConfig -Identity yourdomain.com -Enabled $True",
+        "audit_ui": "1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules > Threat policies.\n3. Select Email authentication settings > DKIM.\n4. Click each domain and verify 'Sign messages for this domain with DKIM signature' is enabled.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-DkimSigningConfig | Format-Table Domain, Enabled\nEnsure Enabled is True for all domains.",
+        "references": [
+          "https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-dkim-configure?view=o365-worldwide"
+        ]
+      },
+      {
+        "id": "2.1.10",
+        "level": "L1",
+        "title": "Ensure DMARC Records for all Exchange Online domains are published",
+        "type": "Manual",
+        "profile_applicability": "E3 Level 1",
+        "description": "DMARC (Domain-based Message Authentication, Reporting, and Conformance) assists recipient mail systems in determining what to do with messages that fail SPF or DKIM checks. It helps authenticate legitimate mail senders and block fraudulent emails.",
+        "rationale": "Implementing DMARC provides assurance that legitimate emails are properly authenticated and allows senders to instruct email servers on how to handle failed authentication. This protects users from spoofed messages.",
+        "impact": "There should be no impact when configured correctly. Misconfiguration may result in deliverability issues.",
+        "output": "Manual control",
+        "remediation": "To remediate using DNS:\n1. Add or update the TXT record for _dmarc.domain.com.\n2. Include at minimum: v=DMARC1; p=quarantine; pct=100; rua=mailto:rua@contoso.com; ruf=mailto:ruf@contoso.com\n3. Modify the domain, email, and policy values based on organizational needs.",
+        "audit_ui": "Not applicable",
+        "audit_powershell": "Resolve-DnsName _dmarc.domain.com -Type TXT | Where-Object { $_.Strings -like 'v=DMARC1*' }\nEnsure it includes p=quarantine or p=reject, pct=100, rua, and ruf values.",
+        "references": [
+          "https://learn.microsoft.com/en-us/defender-office-365/email-authentication-dmarc-configure?view=o365-worldwide",
+          "https://learn.microsoft.com/en-us/defender-office-365/step-by-step-guides/how-to-enable-dmarc-reporting-for-microsoft-online-email-routing-address-moera-and-parked-domains?view=o365-worldwide"
+        ]
+      },
+      {
+        "id": "2.1.11",
+        "level": "L2",
+        "title": "Ensure comprehensive attachment filtering is applied",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 2",
+        "description": "Comprehensive filtering includes both Microsoft’s default blocked attachment types and an extended list of 186 potentially harmful file extensions. These file types are associated with malware, legacy binary files, and compressed containers.",
+        "rationale": "Applying a comprehensive block list minimizes the risk of malware delivery through less common file types that may bypass basic protection.",
+        "impact": "Organizations may need alternative approved transfer methods for essential file types that are blocked.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "To remediate using PowerShell:\n1. Connect-ExchangeOnline\n2. Use a script to update the file type filters for each policy:\nSet-MalwareFilterPolicy -Identity '<PolicyName>' -EnableFileFilter $true -FileTypes <comma-separated list of extensions>",
+        "audit_ui": "Manual review is not recommended due to UI performance limitations. Use PowerShell.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-MalwareFilterPolicy | Where-Object { $_.FileTypes.Count -gt 120 } | Select Name, FileTypes\nEnsure listed extensions match recommended comprehensive list.",
+        "references": [
+          "https://learn.microsoft.com/en-us/powershell/module/exchange/get-malwarefilterpolicy?view=exchange-ps",
+          "https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-malware-policies-configure?view=o365-worldwide",
+          "https://learn.microsoft.com/en-us/office/compatibility/office-file-format-reference"
+        ]
+      },
+      {
+        "id": "2.1.12",
+        "level": "L1",
+        "title": "Ensure the connection filter IP allow list is not used",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "The connection filter IP allow list bypasses spam filtering and authentication checks for specified IP addresses. It may expose organizations to threats if misused.",
+        "rationale": "Allow-listed IPs bypass spam filtering and SPF, DKIM, and DMARC validation, potentially allowing spoofed or malicious email through without detection.",
+        "impact": "Removing IP allow list entries supports the zero trust model and reduces risk. Minimal operational impact if mail flow is already validated through modern protections.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules > Threat policies.\n3. Select Anti-spam > Connection filter policy (Default).\n4. Click Edit connection filter policy.\n5. Remove all IPs from the IP allow list.\n6. Click Save.\n\nTo remediate using PowerShell:\nConnect-ExchangeOnline\nSet-HostedConnectionFilterPolicy -Identity Default -IPAllowList @{}",
+        "audit_ui": "1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules > Threat policies.\n3. Select Anti-spam > Connection filter policy (Default).\n4. Verify the IP allow list is empty.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-HostedConnectionFilterPolicy -Identity Default | fl IPAllowList\nEnsure IPAllowList is empty or {}.",
+        "references": [
+          "https://learn.microsoft.com/en-us/defender-office-365/connection-filter-policies-configure",
+          "https://learn.microsoft.com/en-us/defender-office-365/create-safe-sender-lists-in-office-365#use-the-ip-allow-list",
+          "https://learn.microsoft.com/en-us/defender-office-365/how-policies-and-protections-are-combined#user-and-tenant-settings-conflict"
+        ]
+      },
+      {
+        "id": "2.1.13",
+        "level": "L1",
+        "title": "Ensure the connection filter safe list is off",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "The safe list in the connection filter policy is a pre-configured list of IPs trusted by Microsoft that bypass spam filtering. This list is updated dynamically and not visible to administrators.",
+        "rationale": "Email from safe-listed IPs bypasses filtering and authentication checks, which increases the risk of malicious or spoofed messages reaching the inbox. Disabling this setting supports a zero trust security model.",
+        "impact": "Disabling the safe list reduces the risk of undetected threats, though it may slightly increase false positives.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules > Threat policies.\n3. Select Anti-spam > Connection filter policy (Default).\n4. Click Edit connection filter policy.\n5. Uncheck 'Turn on safe list'.\n6. Click Save.\n\nTo remediate using PowerShell:\nConnect-ExchangeOnline\nSet-HostedConnectionFilterPolicy -Identity Default -EnableSafeList $false",
+        "audit_ui": "1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules > Threat policies.\n3. Select Anti-spam > Connection filter policy (Default).\n4. Confirm 'Turn on safe list' is unchecked.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-HostedConnectionFilterPolicy -Identity Default | fl EnableSafeList\nEnsure EnableSafeList is False.",
+        "references": [
+          "https://learn.microsoft.com/en-us/defender-office-365/connection-filter-policies-configure",
+          "https://learn.microsoft.com/en-us/defender-office-365/create-safe-sender-lists-in-office-365#use-the-ip-allow-list",
+          "https://learn.microsoft.com/en-us/defender-office-365/how-policies-and-protections-are-combined#user-and-tenant-settings-conflict"
+        ]
+      },
+      {
+        "id": "2.1.14",
+        "level": "L1",
+        "title": "Ensure inbound anti-spam policies do not contain allowed domains",
+        "type": "Automated",
+        "profile_applicability": "E3 Level 1",
+        "description": "Inbound anti-spam policies may allow specific domains, bypassing spam filtering and authentication checks. This weakens the effectiveness of email protection.",
+        "rationale": "Messages from allowed domains skip key protections like SPF, DKIM, and DMARC checks. This creates risk of spoofing and phishing attacks, especially when common domains are allowed.",
+        "impact": "Organizations relying on allowed domains may initially see more flagged email. Safer long-term posture supports zero trust.",
+        "output": "<output from PowerShell script here>",
+        "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules > Threat policies.\n3. Select Anti-spam.\n4. Open each inbound policy and click Edit allowed and blocked senders and domains.\n5. Remove any entries under Allowed domains.\n6. Click Done and Save.\n\nTo remediate using PowerShell:\nConnect-ExchangeOnline\n$AllowedDomains = Get-HostedContentFilterPolicy | Where-Object {$_.AllowedSenderDomains}\n$AllowedDomains | Set-HostedContentFilterPolicy -AllowedSenderDomains @{}",
+        "audit_ui": "1. Navigate to Microsoft 365 Defender https://security.microsoft.com.\n2. Expand Email & collaboration > Policies & rules > Threat policies.\n3. Select Anti-spam.\n4. Inspect each inbound anti-spam policy.\n5. Ensure Allowed domains does not contain any entries.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-HostedContentFilterPolicy | ft Identity,AllowedSenderDomains\nEnsure AllowedSenderDomains is undefined or empty.",
+        "references": [
+          "https://learn.microsoft.com/en-us/defender-office-365/anti-spam-protection-about#allow-and-block-lists-in-anti-spam-policies"
+        ]
+      }
+    ]
+    
