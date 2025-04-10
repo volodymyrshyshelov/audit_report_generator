@@ -2,18 +2,18 @@
     {
       "id": "6.1.1",
       "level": "L1",
-      "title": "Ensure 'AuditDisabled' organizationally is set to 'False'",
+      "title": "Ensure 'AuditDisabled' organisationally is set to 'False'",
       "type": "Automated",
       "profile_applicability": "E3 Level 1",
-      "description": "The AuditDisabled parameter determines whether auditing is turned off at the organizational level. Setting it to False ensures auditing is active across the organization.",
+      "description": "The AuditDisabled parameter determines whether auditing is turned off at the organisational level. Setting it to False ensures auditing is active across the organisation.",
       "rationale": "Disabling audit logging prevents tracking of mailbox access and other security-relevant events, reducing forensic and investigative capabilities.",
       "impact": "Enabling auditing may increase log storage and management requirements but improves accountability and visibility.",
       "output": "<output from PowerShell script here>",
-      "remediation": "To remediate using PowerShell:\n1. Connect to Exchange Online using Connect-ExchangeOnline.\n2. Run:\nSet-OrganizationConfig -AuditDisabled $false",
+      "remediation": "To remediate using PowerShell:\n1. Connect to Exchange Online using Connect-ExchangeOnline.\n2. Run:\nSet-OrganisationConfig -AuditDisabled $false",
       "audit_ui": "No UI available for this setting.",
-      "audit_powershell": "Connect-ExchangeOnline\nGet-OrganizationConfig | Format-List AuditDisabled\nEnsure AuditDisabled is False.",
+      "audit_powershell": "Connect-ExchangeOnline\nGet-OrganisationConfig | Format-List AuditDisabled\nEnsure AuditDisabled is False.",
       "references": [
-        "https://learn.microsoft.com/en-us/powershell/module/exchange/set-organizationconfig?view=exchange-ps"
+        "https://learn.microsoft.com/en-us/powershell/module/exchange/set-organisationconfig?view=exchange-ps"
       ]
     },
     {
@@ -57,7 +57,7 @@
       "type": "Automated",
       "profile_applicability": "E3 Level 1",
       "description": "The AuditBypassEnabled flag allows actions on a mailbox to bypass audit logging. Ensuring it is disabled guarantees all actions are captured in the audit logs.",
-      "rationale": "Bypassing audit logging weakens the organization’s ability to detect and respond to inappropriate access or behavior.",
+      "rationale": "Bypassing audit logging weakens the organisation’s ability to detect and respond to inappropriate access or behavior.",
       "impact": "Ensures consistent auditing across all mailboxes. No negative user impact expected.",
       "output": "<output from PowerShell script here>",
       "remediation": "Connect to Exchange Online and run:\nGet-Mailbox -ResultSize Unlimited | Where-Object { $_.AuditBypassEnabled -eq $true } | Set-Mailbox -AuditBypassEnabled $false",

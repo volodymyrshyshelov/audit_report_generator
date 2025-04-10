@@ -1,4 +1,3 @@
-
 . .\init.ps1
 
 
@@ -51,72 +50,108 @@ try {
 .OUTPUTS
     Returns an array of PSObjects with audit results
 #>
+
+
 function Invoke-AuditChecks {
     param (
         [string]$ControlsPath,
         [string]$EvaluationPath
     )
 
-    $evaluation = if (Test-Path $EvaluationPath) {
-        Get-Content -Raw -Path $EvaluationPath | ConvertFrom-Json
-    } else {
-        Write-Host "WARNING: evaluation.json not found." -ForegroundColor Yellow
-        @{}
+    $evaluation = @{}
+    try {
+        if (Test-Path $EvaluationPath -PathType Leaf) {
+            $evaluation = Get-Content -Raw -Path $EvaluationPath -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+        } else {
+            Write-Host "WARNING: evaluation.json not found at path '$EvaluationPath'." -ForegroundColor Yellow
+        }
+    } catch {
+        Write-Host "ERROR: Failed to load evaluation.json: $_" -ForegroundColor Red
     }
 
-
     $auditResults = @()
+    try {
+        $controlFiles = Get-ChildItem -Path $ControlsPath -Recurse -Filter *.json -ErrorAction Stop
+    } catch {
+        Write-Host "ERROR: Failed to get control files from '$ControlsPath': $_" -ForegroundColor Red
+        return $auditResults
+    }
 
-
-    $controlFiles = Get-ChildItem -Path $ControlsPath -Recurse -Filter *.json
-    
     foreach ($file in $controlFiles) {
-        $controls = Get-Content -Raw -Path $file.FullName | ConvertFrom-Json
-        foreach ($control in $controls) {
+        try {
+            $jsonContent = Get-Content -Raw -Path $file.FullName -ErrorAction Stop
+            $controls = $jsonContent | ConvertFrom-Json -ErrorAction Stop
 
-            $status = "N/A"
-            $details = ""
-            $section = $control.id.Split('.')[0]
-            $auditPath = ".\audits\$section\$($control.id).ps1"
-
-            if ($control.type -eq "Manual") {
-                $status = "Manual"
-                $details = "Manual verification required"
+            if ($controls -isnot [array] -and $controls -isnot [System.Collections.IEnumerable]) {
+                $controls = @($controls)
             }
-            elseif (Test-Path $auditPath) {
+
+            foreach ($control in $controls) {
                 try {
-                    $auditResult = . $auditPath 2>&1 | Out-String
-                    $details = $auditResult.Trim()
-                    
-                    if ($evaluation.PSObject.Properties.Name -contains $control.id) {
-                        $eval = $evaluation."$($control.id)".Check
-                        if ($null -ne $eval.ExpectedMatch) {
-                            $status = if ([regex]::IsMatch($auditResult, $eval.Regex) -eq $eval.ExpectedMatch) { "Pass" } else { "Fail" }
-                        }
-                        elseif ($null -ne $eval.ExpectedRange) {
-                            $match = [regex]::Match($auditResult, $eval.Regex)
-                            $status = if ($match.Success -and ($eval.ExpectedRange -contains [int]$match.Value)) { "Pass" } else { "Fail" }
+                    if ($null -eq $control.id -or $null -eq $control.type) {
+                        Write-Host "WARNING: Control is missing required fields (id or type) in file '$($file.FullName)'" -ForegroundColor Yellow
+                        continue
+                    }
+
+                    $status = "N/A"
+                    $details = ""
+                    $section = $control.id.Split('.')[0]
+                    $auditPath = Join-Path -Path ".\audits\$section" -ChildPath "$($control.id).ps1"
+
+                    if ($control.type -eq "Manual") {
+                        $status = "Manual"
+                        $details = "Manual verification required"
+                    }
+                    elseif (Test-Path $auditPath -PathType Leaf) {
+                        try {
+                            $auditResult = & $auditPath 2>&1 | Out-String
+                            $details = $auditResult.Trim()
+                            
+                            if ($evaluation.PSObject.Properties.Name -contains $control.id) {
+                                $eval = $evaluation."$($control.id)".Check
+                                if ($null -ne $eval.ExpectedMatch) {
+                                    $status = if ([regex]::IsMatch($auditResult, $eval.Regex) -eq $eval.ExpectedMatch) { "Pass" } else { "Fail" }
+                                }
+                                elseif ($null -ne $eval.ExpectedRange) {
+                                    try {
+                                        $match = [regex]::Match($auditResult, $eval.Regex)
+                                        if ($match.Success) {
+                                            $value = [int]$match.Value
+                                            $status = if ($eval.ExpectedRange -contains $value) { "Pass" } else { "Fail" }
+                                        } else {
+                                            $status = "Fail (no match)"
+                                        }
+                                    } catch {
+                                        $status = "Error (range check)"
+                                        $details += "`nRange check error: $_"
+                                    }
+                                }
+                            }
+                        } catch {
+                            $status = "Error"
+                            $details = "Failed to execute audit script: $_"
                         }
                     }
+                    else {
+                        $details = "Automated control - Need Administrator permission"
+                    }
+
+                    $auditResults += [PSCustomObject]@{
+                        ID      = $control.id
+                        Title   = if ($null -ne $control.title) { $control.title } else { "N/A" }
+                        Level   = if ($null -ne $control.level) { $control.level } else { "N/A" }
+                        Type    = $control.type
+                        Status  = $status
+                        Details = $details
+                        Section = $section
+                    }
+
                 } catch {
-                    $status = "Error"
-                    $details = "Failed to execute audit script: $_"
+                    Write-Host "ERROR: Failed to process control in file '$($file.FullName)': $_" -ForegroundColor Red
                 }
             }
-            else {
-                $details = "Automated control - Need Administrator permission"
-            }
-
-   
-            $auditResults += [PSCustomObject]@{
-                ID = $control.id
-                Title = $control.title
-                Level = $control.level
-                Type = $control.type
-                Status = $status
-                Details = $details
-                Section = $section
-            }
+        } catch {
+            Write-Host "ERROR: Failed to process control file '$($file.FullName)': $_" -ForegroundColor Red
         }
     }
 
@@ -171,17 +206,17 @@ function New-SummaryTable {
     $summaryTable.Range.Font.Name = "Calibri"
     $summaryTable.Range.Font.Size = 11
 
-
     $pageWidth = $Doc.PageSetup.PageWidth - $Doc.PageSetup.LeftMargin - $Doc.PageSetup.RightMargin
+
+    $summaryTable.PreferredWidthType = 1  # wdPreferredWidthPoints
     $summaryTable.PreferredWidth = $pageWidth
-
-
-    $summaryTable.Columns.Item(1).PreferredWidthType = 2  # wdPreferredWidthPercent
-    $summaryTable.Columns.Item(1).PreferredWidth = 15
-    $summaryTable.Columns.Item(2).PreferredWidthType = 2
-    $summaryTable.Columns.Item(2).PreferredWidth = 70
-    $summaryTable.Columns.Item(3).PreferredWidthType = 2
-    $summaryTable.Columns.Item(3).PreferredWidth = 15
+    $summaryTable.AutoFitBehavior(0)
+    
+    $summaryTable.Columns.Item(1).SetWidth($pageWidth * 0.15, 1)
+    $summaryTable.Columns.Item(2).SetWidth($pageWidth * 0.70, 1)
+    $summaryTable.Columns.Item(3).SetWidth($pageWidth * 0.15, 1)
+    
+    
 
 
     $headerRow = $summaryTable.Rows.Item(1)
@@ -226,7 +261,7 @@ function New-SummaryTable {
             } catch { /* Ignore */ }
         }
         elseif ($section.type -eq "subsection") {
- 
+
             $subsectionRow = $summaryTable.Rows.Item($currentRow)
             $currentRow++
             
@@ -275,8 +310,6 @@ function New-SummaryTable {
             }
         }
     }
-
-   
     try {
         while ($summaryTable.Rows.Count -gt $currentRow - 1) {
             $summaryTable.Rows.Item($summaryTable.Rows.Count).Delete()
@@ -292,10 +325,6 @@ function New-SummaryTable {
 }
 
 
-
-
-
-
 function New-DetailedControlTables {
     param (
         [object]$Word,
@@ -303,48 +332,84 @@ function New-DetailedControlTables {
         [array]$AuditResults,
         [string]$ControlsPath
     )
+
     if ($null -eq $Word -or $null -eq $Doc) {
         Write-Host "CRITICAL ERROR: Word or Document object is null" -ForegroundColor Red
         return
     }
 
+    if ($null -eq $AuditResults -or $AuditResults.Count -eq 0) {
+        Write-Host "WARNING: No audit results to process" -ForegroundColor Yellow
+        return
+    }
+
+    # Define colors for different statuses
+    $colorPass = 5287936    # Green
+    $colorFail = 255        # Red
+    $colorManual = 49407    # Orange
+    $colorDefault = 14277081 # Gray
+
+$newColorValue = [int]((253 * 1) + (233 * 256) + (217 * 65536))
+
+
+$colorHeader = $newColorValue
+$colorSection = $newColorValue
+    
+
     try {
- 
-        $allControls = @()
-        $controlFiles = Get-ChildItem -Path $ControlsPath -Recurse -Filter *.json -ErrorAction SilentlyContinue
-        
-        foreach ($file in $controlFiles) {
-            try {
-                $jsonContent = Get-Content -Raw -Path $file.FullName
-                $controls = $jsonContent | ConvertFrom-Json -ErrorAction Stop
-                
-
-                if ($controls -is [array]) {
-                    $allControls += $controls
+        $allControls = @{}
+        try {
+            $controlFiles = Get-ChildItem -Path $ControlsPath -Recurse -Filter *.json -ErrorAction Stop
+            foreach ($file in $controlFiles) {
+                try {
+                    $jsonContent = Get-Content -Raw -Path $file.FullName -ErrorAction Stop
+                    $controls = $jsonContent | ConvertFrom-Json -ErrorAction Stop
+                    if ($controls -is [array]) {
+                        foreach ($ctrl in $controls) {
+                            if ($null -ne $ctrl.id) {
+                                $allControls[$ctrl.id] = $ctrl
+                            }
+                        }
+                    } elseif ($null -ne $controls.id) {
+                        $allControls[$controls.id] = $controls
+                    }
+                } catch {
+                    Write-Host "ERROR: Failed to parse control file $($file.FullName): $_" -ForegroundColor Red
                 }
-
-                elseif ($controls -is [pscustomobject]) {
-                    $allControls += $controls
-                }
-            } catch {
-                Write-Host "ERROR: Failed to parse control file $($file.FullName): $_" -ForegroundColor Red
             }
+        } catch {
+            Write-Host "ERROR: Failed to get control files from ${ControlsPath}: $_" -ForegroundColor Red
+            return
         }
-
 
         foreach ($auditResult in $AuditResults) {
             try {
-                
-                $section = $auditResult.ID.Split('.')[0]
-                
-       
-                $control = $allControls | Where-Object { $_.id -eq $auditResult.ID } | Select-Object -First 1
-                
+                # Проверка наличия обязательных полей
+                if ($null -eq $auditResult.ID) {
+                    Write-Host "WARNING: Audit result with missing ID encountered" -ForegroundColor Yellow
+                    continue
+                }
+
+                $control = $allControls[$auditResult.ID]
                 if (-not $control) {
                     Write-Host "WARNING: Control definition not found for $($auditResult.ID)" -ForegroundColor Yellow
                     continue
                 }
 
+                # Determine status and header color
+                $status = if ($control.type -eq "Manual") {
+                    "Manual"
+                } else {
+                    if ($null -ne $auditResult.Status) { $auditResult.Status } else { "Not evaluated" }
+                }
+
+                $headerColor = switch ($status) {
+                    "Pass"        { $colorPass }
+                    "Fail"        { $colorFail }
+                    "Manual"      { $colorManual }
+                    "Range Check" { 65535 } # Yellow
+                    default       { $colorDefault }
+                }
 
                 $statusText = if ($control.type -eq "Manual") {
                     "Manual check required"
@@ -357,91 +422,120 @@ function New-DetailedControlTables {
                 } else {
                     if ($null -ne $auditResult.Details) { $auditResult.Details } else { "No details available" }
                 }
-
-
-                $range = $Doc.Content
-                $range.Collapse(0)
-                $range.InsertBreak(7) 
-                $range.InsertParagraphAfter()
-                $range.Collapse(0)
-                
-                $table = $Doc.Tables.Add($range, 16, 1)
-                $table.Borders.Enable = $true
-                $table.Range.Font.Name = "Calibri"
-                $table.Range.Font.Size = 11
-                $table.Range.ParagraphFormat.SpaceAfter = 6
-                $table.AllowAutoFit = $true
-
-
-                $colorHeader = 15987699   #
-                $colorSection = 12829635  
-
-
-                $table.Cell(1,1).Range.Text = "$($control.id) ($($control.level)) $($control.title) ($($control.type))"
-                $table.Cell(1,1).Range.Font.Bold = $true
-                $table.Cell(1,1).Range.Font.Size = 14
-                $table.Cell(1,1).Range.ParagraphFormat.Alignment = 1 # Center
-                $table.Cell(1,1).Shading.BackgroundPatternColor = $colorHeader
-
-
-                $table.Cell(3,1).Range.Text = "Description"
-                $table.Cell(3,1).Range.Font.Bold = $true
-                $table.Cell(3,1).Shading.BackgroundPatternColor = $colorSection
-                $table.Cell(4,1).Range.Text = $control.description
-
- 
-                $table.Cell(5,1).Range.Text = "Rationale"
-                $table.Cell(5,1).Range.Font.Bold = $true
-                $table.Cell(5,1).Shading.BackgroundPatternColor = $colorHeader
-                $table.Cell(6,1).Range.Text = $control.rationale
-
-
-                $table.Cell(7,1).Range.Text = "Impact"
-                $table.Cell(7,1).Range.Font.Bold = $true
-                $table.Cell(7,1).Shading.BackgroundPatternColor = $colorSection
-                $table.Cell(8,1).Range.Text = $control.impact
-
-
-                $table.Cell(9,1).Range.Text = "Output"
-                $table.Cell(9,1).Range.Font.Bold = $true
-                $table.Cell(9,1).Shading.BackgroundPatternColor = $colorHeader
-                $table.Cell(10,1).Range.Text = "RESULT: $statusText`r$detailsText"
-
-
-                $table.Cell(11,1).Range.Text = "Remediation"
-                $table.Cell(11,1).Range.Font.Bold = $true
-                $table.Cell(11,1).Shading.BackgroundPatternColor = $colorSection
-                $table.Cell(12,1).Range.Text = $control.remediation
-
-
-                $table.Cell(13,1).Range.Text = "How to Audit (UI)"
-                $table.Cell(13,1).Range.Font.Bold = $true
-                $table.Cell(13,1).Shading.BackgroundPatternColor = $colorHeader
-                $table.Cell(14,1).Range.Text = $control.audit_ui
-
-
-                $table.Cell(15,1).Range.Text = "References"
-                $table.Cell(15,1).Range.Font.Bold = $true
-                $table.Cell(15,1).Shading.BackgroundPatternColor = $colorSection
-                
-
-                if ($control.references -and $control.references.Count -gt 0) {
-                    $refRange = $table.Cell(16,1).Range
-                    $refRange.Text = ""
-                    
-                    foreach ($ref in $control.references) {
-                        if ($ref -match '^https?://') {
-                            $refRange.Hyperlinks.Add($refRange, $ref, "", "", $ref) | Out-Null
-                            $refRange.InsertAfter("$ref`r")
-                        } else {
-                            $refRange.InsertAfter("$ref`r")
-                        }
-                    }
-                } else {
-                    $table.Cell(16,1).Range.Text = "N/A"
+                try {
+                    $range = $Doc.Content
+                    $range.Collapse(0)
+                    $range.InsertBreak(7) # Разрыв страницы
+                    $range.Collapse(0)
+                } catch {
+                    Write-Host "ERROR: Failed to prepare document range for $($auditResult.ID): $_" -ForegroundColor Red
+                    continue
                 }
 
-                $table.AutoFitBehavior(1) # wdAutoFitContent
+                try {
+                    $table = $Doc.Tables.Add($range, 15, 1)
+                    $table.Borders.Enable = $true
+                    $table.Range.Font.Name = "Calibri"
+                    $table.Range.Font.Size = 11
+                    $table.Range.ParagraphFormat.SpaceAfter = 6
+                    $table.AllowAutoFit = $true
+
+                    function Safe-FillCell {
+                        param($row, $text, $bold, $size, $color, $alignment)
+                        
+                        try {
+                            $cell = $table.Cell($row, 1)
+                            $cell.Range.Text = if ($null -ne $text) { $text -replace "`n", "`r" } else { "N/A" }
+                            if ($bold) { $cell.Range.Font.Bold = $true }
+                            if ($size) { $cell.Range.Font.Size = $size }
+                            if ($alignment) { $cell.Range.ParagraphFormat.Alignment = $alignment }
+                            if ($color) { 
+                                try { $cell.Shading.BackgroundPatternColor = $color } catch {}
+                            }
+                        } catch {
+                            Write-Host "WARNING: Failed to fill cell $row for $($auditResult.ID)" -ForegroundColor Yellow
+                        }
+                    }
+
+                    # Header row with status-based color and left alignment
+                    Safe-FillCell -row 1 -text "$($control.id) ($($control.level)) $($control.title) ($($control.type))" `
+                        -bold $true -size 14 -color $headerColor -alignment 0 # Left aligned
+
+                    # All other header cells left aligned
+                    Safe-FillCell -row 2 -text "Description" -bold $true -color $colorSection -alignment 0
+                    Safe-FillCell -row 3 -text $($control.description) -alignment 0
+
+                    Safe-FillCell -row 4 -text "Rationale" -bold $true -color $colorHeader -alignment 0
+                    Safe-FillCell -row 5 -text $($control.rationale) -alignment 0
+
+                    Safe-FillCell -row 6 -text "Impact" -bold $true -color $colorSection -alignment 0
+                    Safe-FillCell -row 7 -text $($control.impact) -alignment 0
+
+                    Safe-FillCell -row 8 -text "Output" -bold $true -color $colorHeader -alignment 0
+                    Safe-FillCell -row 9 -text "RESULT: $statusText`r$detailsText" -alignment 0
+
+                    Safe-FillCell -row 10 -text "Configuration" -bold $true -color $colorSection -alignment 0
+                    Safe-FillCell -row 11 -text $($control.remediation) -alignment 0
+
+                    Safe-FillCell -row 12 -text "How to Audit (UI)" -bold $true -color $colorHeader -alignment 0
+                    Safe-FillCell -row 13 -text $($control.audit_ui) -alignment 0
+
+                    Safe-FillCell -row 14 -text "References" -bold $true -color $colorSection -alignment 0
+                    
+try {
+    $refCell = $table.Cell(15,1)
+    $refCell.Range.Text = ""
+    $refCell.Range.ParagraphFormat.Alignment = 0 # Left align
+    
+    if ($control.references -and $control.references.Count -gt 0) {
+        $referencesToAdd = @()
+        
+        foreach ($ref in $control.references) {
+            if ($ref -match '^https?://') {
+                $referencesToAdd += @{
+                    Text = $ref
+                    Address = $ref
+                    IsHyperlink = $true
+                }
+            } else {
+                $referencesToAdd += @{
+                    Text = $ref
+                    IsHyperlink = $false
+                }
+            }
+        }
+        
+
+        foreach ($refObj in $referencesToAdd) {
+            if ($refCell.Range.Text -ne "") {
+                $refCell.Range.InsertParagraphAfter()
+                $refCell.Range.Collapse(0) 
+            }
+            
+            if ($refObj.IsHyperlink) {
+
+                $range = $refCell.Range
+                $range.InsertAfter($refObj.Text)
+                $hyperlinkRange = $Doc.Range($range.End - $refObj.Text.Length - 1, $range.End - 1)
+                $null = $Doc.Hyperlinks.Add($hyperlinkRange, $refObj.Address)
+            } else {
+
+                $refCell.Range.InsertAfter($refObj.Text)
+            }
+        }
+    } else {
+        $refCell.Range.Text = "N/A"
+    }
+} catch {
+    Write-Host "WARNING: Failed to add references for $($auditResult.ID): $_" -ForegroundColor Yellow
+}
+
+
+                    try { $table.AutoFitBehavior(1) } catch {}
+
+                } catch {
+                    Write-Host "ERROR: Failed to create table for $($auditResult.ID): $_" -ForegroundColor Red
+                }
 
             } catch {
                 Write-Host "ERROR: Failed to process control $($auditResult.ID): $_" -ForegroundColor Red
@@ -455,47 +549,63 @@ function New-DetailedControlTables {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 $sections = Get-Content -Raw -Path $sectionMapPath | ConvertFrom-Json
-
+$config = Get-Content -Raw -Path $configPath | ConvertFrom-Json
 
 $auditResults = Invoke-AuditChecks -ControlsPath $controlsPath -EvaluationPath $evaluationPath
 
+# ===== TITUL PAGE (via Range at start of doc) =====
+$titulRange = $doc.Range(0, 0)
 
-InsertText -text $config.reportTitle -bold $true -size 18 -alignment 1
-InsertText -text $config.reportSubtitle -bold $true -size 14 -alignment 1
-InsertText -text $config.introText -size 12
+# Title
+$titulRange.Text = $config.reportTitle
+$titulRange.Font.Bold = $true
+$titulRange.Font.Size = 18
+$titulRange.ParagraphFormat.Alignment = 1
+$titulRange.InsertParagraphAfter()
+$titulRange = $doc.Range($titulRange.End, $titulRange.End)
 
+# Subtitle
+$titulRange.Text = $config.reportSubtitle
+$titulRange.Font.Bold = $true
+$titulRange.Font.Size = 14
+$titulRange.ParagraphFormat.Alignment = 1
+$titulRange.InsertParagraphAfter()
+$titulRange = $doc.Range($titulRange.End, $titulRange.End)
 
-$word.Selection.InsertBreak(7)  # wdPageBreak
+# Intro Text
+$titulRange.Text = $config.introText
+$titulRange.Font.Bold = $false
+$titulRange.Font.Size = 12
+$titulRange.ParagraphFormat.Alignment = 0
+$titulRange.InsertParagraphAfter()
+$titulRange = $doc.Range($titulRange.End, $titulRange.End)
 
+# Presentation
+$titulRange.Text = $config.presentationText
+$titulRange.Font.Size = 12
+$titulRange.InsertParagraphAfter()
+$titulRange = $doc.Range($titulRange.End, $titulRange.End)
 
+# Footer
+$titulRange.Text = $config.footerText
+$titulRange.Font.Italic = $true
+$titulRange.Font.Size = 10
+$titulRange.InsertParagraphAfter()
+$titulRange = $doc.Range($titulRange.End, $titulRange.End)
+
+# Page break
+$titulRange.InsertBreak(7)  # wdPageBreak
+
+$word.Selection.EndKey(6)  # wdStory
+
+# ===== SUMMARY TABLE =====
 $summaryTable = New-SummaryTable -Word $word -Doc $doc -AuditResults $auditResults -Sections $sections
 
-
-$word.Selection.InsertBreak(7)  # wdPageBreak
-
-
+# ===== DETAILED TABLES =====
 New-DetailedControlTables -Word $word -Doc $doc -AuditResults $auditResults -ControlsPath ".\controls"
 
-
-$word.Selection.InsertBreak(7)
-
-
+# ===== SAVE AND CLOSE =====
 try {
     $doc.Fields.Update()
     $doc.SaveAs($outputPath)
@@ -505,7 +615,7 @@ try {
     Write-Host "ERROR: Failed to save document: $_" -ForegroundColor Red
 }
 
-
+# ===== CLEANUP =====
 if ($word) {
     $word.Quit()
     [System.Runtime.InteropServices.Marshal]::ReleaseComObject($word) | Out-Null

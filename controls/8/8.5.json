@@ -40,12 +40,12 @@
         "type": "Automated",
         "profile_applicability": "E3 Level 1",
         "description": "Restricts lobby bypass to internal users only. All external participants must wait in the lobby until admitted.",
-        "rationale": "Ensures that only trusted organizational users can join meetings directly, enhancing meeting control.",
-        "impact": "Guests and external users will be held in the lobby until an organizer admits them.",
+        "rationale": "Ensures that only trusted organisational users can join meetings directly, enhancing meeting control.",
+        "impact": "Guests and external users will be held in the lobby until an organiser admits them.",
         "output": "<output from PowerShell script here>",
-        "remediation": "Set-CsTeamsMeetingPolicy -WhoCanBypassLobby 'Organization'",
-        "audit_ui": "Teams admin center > Meetings > Meeting policies\nConfirm the lobby bypass setting is configured to 'People in my organization'.",
-        "audit_powershell": "Get-CsTeamsMeetingPolicy | Format-Table Identity, WhoCanBypassLobby\nEnsure value is 'Organization'.",
+        "remediation": "Set-CsTeamsMeetingPolicy -WhoCanBypassLobby 'organisation'",
+        "audit_ui": "Teams admin center > Meetings > Meeting policies\nConfirm the lobby bypass setting is configured to 'People in my organisation'.",
+        "audit_powershell": "Get-CsTeamsMeetingPolicy | Format-Table Identity, WhoCanBypassLobby\nEnsure value is 'organisation'.",
         "references": [
           "https://learn.microsoft.com/en-us/microsoftteams/meeting-policies-in-teams"
         ]
@@ -58,7 +58,7 @@
         "profile_applicability": "E3 Level 1",
         "description": "This setting ensures that PSTN users must wait in the lobby until admitted to a Teams meeting.",
         "rationale": "Requiring lobby approval for dial-in users prevents unauthorized or disruptive access to meetings.",
-        "impact": "PSTN users will not join meetings until allowed in by an organizer.",
+        "impact": "PSTN users will not join meetings until allowed in by an organiser.",
         "output": "<output from PowerShell script here>",
         "remediation": "Run:\nSet-CsTeamsMeetingPolicy -AllowPSTNUsersToBypassLobby $false",
         "audit_ui": "Teams admin center > Meetings > Meeting policies\nCheck that 'Dial-in users can bypass lobby' is disabled.",
@@ -87,16 +87,16 @@
       {
         "id": "8.5.6",
         "level": "L2",
-        "title": "Ensure only organizers and co-organizers can present",
+        "title": "Ensure only organisers and co-organisers can present",
         "type": "Automated",
         "profile_applicability": "E3 Level 2",
-        "description": "Restricts screen sharing and presentation privileges in meetings to only organizers and co-organizers.",
+        "description": "Restricts screen sharing and presentation privileges in meetings to only organisers and co-organisers.",
         "rationale": "Prevents disruptions and ensures only trusted users control presentation flow during meetings.",
-        "impact": "Other participants will be unable to present unless promoted by the organizer.",
+        "impact": "Other participants will be unable to present unless promoted by the organiser.",
         "output": "<output from PowerShell script here>",
-        "remediation": "Set-CsTeamsMeetingPolicy -WhoCanPresent 'OrganizersAndCoOrganizers'",
-        "audit_ui": "Teams admin center > Meetings > Meeting policies\nCheck that the setting for who can present is limited to organizers and co-organizers.",
-        "audit_powershell": "Get-CsTeamsMeetingPolicy | Format-Table Identity, WhoCanPresent\nEnsure value is 'OrganizersAndCoOrganizers'.",
+        "remediation": "Set-CsTeamsMeetingPolicy -WhoCanPresent 'organisersAndCoorganisers'",
+        "audit_ui": "Teams admin center > Meetings > Meeting policies\nCheck that the setting for who can present is limited to organisers and co-organisers.",
+        "audit_powershell": "Get-CsTeamsMeetingPolicy | Format-Table Identity, WhoCanPresent\nEnsure value is 'organisersAndCoorganisers'.",
         "references": [
           "https://learn.microsoft.com/en-us/powershell/module/teams/set-csteamsmeetingpolicy"
         ]
@@ -125,7 +125,7 @@
         "type": "Automated",
         "profile_applicability": "E3 Level 2",
         "description": "Prevents external users from participating in chat during meetings to protect internal discussions.",
-        "rationale": "Mitigates risk of data exposure or leaks via chat to users outside the organization.",
+        "rationale": "Mitigates risk of data exposure or leaks via chat to users outside the organisation.",
         "impact": "External participants will not be able to use meeting chat.",
         "output": "<output from PowerShell script here>",
         "remediation": "Set-CsTeamsMeetingPolicy -AllowExternalUserToParticipateInMeetingChat $false",

@@ -10,7 +10,7 @@
     "impact": "Users may need to request admin approval for new add-ins. Reduces flexibility but improves security.",
     "output": "<output from PowerShell script here>",
     "remediation": "Connect to Exchange Online and run:\nSet-OwaMailboxPolicy -Identity OwaMailboxPolicy-Default -DefaultThemeEnabled $false -AddInsEnabled $false",
-    "audit_ui": "Exchange admin center > Organization > Add-ins\nReview whether user-installed add-ins are disabled.",
+    "audit_ui": "Exchange admin center > Organisation > Add-ins\nReview whether user-installed add-ins are disabled.",
     "audit_powershell": "Connect-ExchangeOnline\nGet-OwaMailboxPolicy | Format-List Identity, AddInsEnabled\nEnsure AddInsEnabled is False.",
     "references": [
       "https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/outlook-on-the-web/outlook-web-app-policies"

@@ -22,7 +22,7 @@
       "title": "Ensure 'Access reviews' for Guest Users are configured",
       "type": "Manual",
       "profile_applicability": "E3 Level 1",
-      "description": "Access reviews allow organizations to regularly review and validate user access. Guest users should be reviewed periodically to remove inactive or unnecessary accounts.",
+      "description": "Access reviews allow organisations to regularly review and validate user access. Guest users should be reviewed periodically to remove inactive or unnecessary accounts.",
       "rationale": "Regularly reviewing guest access ensures that only authorized external users retain access, minimizing risk.",
       "impact": "Owners or reviewers must periodically review guest access. Automation can assist with enforcement.",
       "output": "Manual control",

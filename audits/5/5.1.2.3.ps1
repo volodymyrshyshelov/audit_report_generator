@@ -4,11 +4,13 @@ try {
     $permissions = (Get-MgPolicyAuthorizationPolicy -ErrorAction Stop).DefaultUserRolePermissions
 
     if ($permissions.AllowedToCreateTenants -eq $false) {
-        $output = "SUCCESS: Non-admin users are restricted from creating tenants."
+        $output = "SUCCESS: Non-admin users are restricted from creating tenants.`n"
+        $output += "AllowedToCreateTenants : $($permissions.AllowedToCreateTenants)"
     } else {
         $output = "WARNING: Non-admin users ARE allowed to create tenants.`n"
-        $output += "AllowedToCreateTenants: $($permissions.AllowedToCreateTenants)"
+        $output += "AllowedToCreateTenants : $($permissions.AllowedToCreateTenants)"
     }
+    
 
     Write-Output $output
 }

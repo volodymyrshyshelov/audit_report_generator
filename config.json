@@ -1,7 +1,8 @@
 {
-    "reportTitle": "Microsoft 365 Security Audit Report",
-    "reportSubtitle": "Audit Generated for Global Reader Account",
-    "introText": "This document outlines audit findings for Microsoft 365, categorized by the CIS Benchmark v4.0.0.",
-    "outputPath": ".\\reports"
-  }
-  
+  "reportTitle": "Microsoft 365 Security Audit Report",
+  "reportSubtitle": "Audit Generated for Global Reader Account",
+  "introText": "This document outlines audit findings for Microsoft 365, categorized by the CIS Benchmark v4.0.0.",
+  "presentationText": "This audit report provides insights into the current security configuration of your Microsoft 365 environment. All controls are based on the CIS Microsoft 365 Foundations Benchmark v4.0.0 and evaluated using read-only access via the Global Reader role. Use this document to assess compliance and identify areas for improvement.",
+  "footerText": "Generated automatically using PowerShell and Microsoft Graph. Please review carefully before distribution.",
+  "outputPath": ".\\reports"
+}

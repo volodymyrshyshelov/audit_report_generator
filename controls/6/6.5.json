@@ -9,9 +9,9 @@
         "rationale": "Legacy authentication lacks security features and cannot enforce modern policies, posing a risk of credential theft.",
         "impact": "Clients that don't support modern auth may stop functioning. Ensure supported clients are used.",
         "output": "<output from PowerShell script here>",
-        "remediation": "Run in Exchange Online PowerShell:\nSet-OrganizationConfig -OAuth2ClientProfileEnabled $true",
+        "remediation": "Run in Exchange Online PowerShell:\nSet-organisationConfig -OAuth2ClientProfileEnabled $true",
         "audit_ui": "Modern auth is managed via PowerShell, not UI.",
-        "audit_powershell": "Connect-ExchangeOnline\nGet-OrganizationConfig | Format-List OAuth2ClientProfileEnabled\nEnsure it is True.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-organisationConfig | Format-List OAuth2ClientProfileEnabled\nEnsure it is True.",
         "references": [
           "https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/enable-or-disable-modern-authentication"
         ]
@@ -26,9 +26,9 @@
         "rationale": "MailTips help alert users to potential issues such as external recipients or large recipient groups, reducing risk of data leakage.",
         "impact": "Minor increase in user prompts, but overall improves communication awareness.",
         "output": "<output from PowerShell script here>",
-        "remediation": "Run:\nSet-OrganizationConfig -MailTipsAllTipsEnabled $true",
+        "remediation": "Run:\nSet-organisationConfig -MailTipsAllTipsEnabled $true",
         "audit_ui": "Not configurable via UI.",
-        "audit_powershell": "Connect-ExchangeOnline\nGet-OrganizationConfig | Format-List MailTipsAllTipsEnabled\nEnsure it is True.",
+        "audit_powershell": "Connect-ExchangeOnline\nGet-organisationConfig | Format-List MailTipsAllTipsEnabled\nEnsure it is True.",
         "references": [
           "https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/mailtips/mailtips-overview"
         ]

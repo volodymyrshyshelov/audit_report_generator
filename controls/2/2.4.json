@@ -43,7 +43,7 @@
       "type": "Manual",
       "profile_applicability": "E5 Level 2",
       "description": "Defender for Cloud Apps provides visibility into suspicious activity in Microsoft 365. It includes threat detection such as impossible travel, mass file access, and anonymous login. Integration with Microsoft Defender enables proactive remediation.",
-      "rationale": "Cloud App Security allows organizations to detect and respond to anomalies across Office 365, Azure, and third-party apps. It integrates with Conditional Access and Microsoft Defender for Endpoint.",
+      "rationale": "Cloud App Security allows organisations to detect and respond to anomalies across Office 365, Azure, and third-party apps. It integrates with Conditional Access and Microsoft Defender for Endpoint.",
       "impact": "May require license upgrades and coordination with multiple admin teams. False positives possible without tuning.",
       "output": "Manual control",
       "remediation": "1. Go to https://security.microsoft.com.\n2. Navigate to System > Settings > Cloud apps.\n3. Connect Office 365 and Azure via App connectors.\n4. Enable file monitoring under Information Protection.\n5. Enable Defender for Endpoint integration under Cloud Discovery.",

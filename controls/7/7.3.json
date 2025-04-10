@@ -24,7 +24,7 @@
     "type": "Automated",
     "profile_applicability": "E3 Level 2",
     "description": "Restrict syncing files to unmanaged devices by enabling the setting in the SharePoint admin center or via PowerShell.",
-    "rationale": "Prevents data exfiltration and ensures only managed and compliant devices can sync organizational content.",
+    "rationale": "Prevents data exfiltration and ensures only managed and compliant devices can sync organisational content.",
     "impact": "Users on unmanaged devices will not be able to use the sync client for OneDrive.",
     "output": "<output from PowerShell script here>",
     "remediation": "Set-SPOTenant -ConditionalAccessPolicy AllowLimitedAccess",

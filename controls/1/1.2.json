@@ -2,11 +2,11 @@
     {
       "id": "1.2.1",
       "level": "L2",
-      "title": "Ensure that only organizationally managed/approved public groups exist",
+      "title": "Ensure that only organisationally managed/approved public groups exist",
       "type": "Automated",
       "profile_applicability": "E3 Level 2",
       "description": "Microsoft 365 Groups is the foundational membership service that drives teamwork across Microsoft 365. With Microsoft 365 Groups, you can give a group of people access to a collection of shared resources. When a group is created via the admin panel, its default privacy value is 'Public'.",
-      "rationale": "Ensure that only organizationally managed and approved public groups exist. Public groups allow access to data via Azure portal, access panel, or SharePoint URLs—even without approval. These URLs can be guessed or discovered, potentially exposing sensitive information.",
+      "rationale": "Ensure that only organisationally managed and approved public groups exist. Public groups allow access to data via Azure portal, access panel, or SharePoint URLs—even without approval. These URLs can be guessed or discovered, potentially exposing sensitive information.",
       "impact": "Group owners may receive an increased number of access requests, especially for groups originally meant to be public.",
       "output": "<output from PowerShell script here>",
       "remediation": "To remediate using the UI:\n1. Navigate to Microsoft 365 admin center https://admin.microsoft.com.\n2. Expand Teams & groups and select Active teams & groups.\n3. Select the public group from the list.\n4. In the group settings panel, select Settings.\n5. Under Privacy, change the value to Private.",

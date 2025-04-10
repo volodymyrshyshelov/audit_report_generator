@@ -9,17 +9,15 @@ try {
         $output = "WARNING: No dynamic groups found."
     } else {
         $guestGroups = $groups | Where-Object {
-            $_.MembershipRule -match 'user\.userType\s*-eq\s*"Guest"'
+            $_.MembershipRule -match 'user\.userType\s*-\s*eq\s*"Guest"'
         }
 
         if ($guestGroups.Count -gt 0) {
-            $output = "SUCCESS: Found dynamic group(s) with guest user rule:`n"
-            $output += ($guestGroups | Format-Table DisplayName, MembershipRule -AutoSize | Out-String)
+            $output = "SUCCESS: Found at least one dynamic group for guest users.`n"
+            $output += "MembershipRule : user.userType -eq `"Guest`""
         } else {
-            $output = 'WARNING: No dynamic groups contain "user.userType -eq ""Guest""" rule.'
-
-
-
+            $output = "WARNING: No dynamic groups contain required rule.`n"
+            $output += "MembershipRule : NOT FOUND"
         }
     }
 
